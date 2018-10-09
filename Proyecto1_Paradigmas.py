@@ -57,5 +57,27 @@ helpmenu.add_command(label="Help Index", command=donothing)
 helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
+text = Text(root, height=100, width=175)
+
+text.tag_configure('bold_italics', 
+                   font=('Verdana', 12, 'bold', 'italic'))
+
+text.tag_configure('big', 
+                   font=('Verdana', 24, 'bold'))
+text.tag_configure('color', 
+                   foreground='blue', 
+                   font=('Tempus Sans ITC', 14))
+                   
+text.tag_configure('groove', 
+                   relief=GROOVE, 
+                   borderwidth=2)
+                   
+text.tag_bind('bite', 
+              '<1>', 
+              lambda e, t=text: t.insert(END, "Text"))
+
+text.pack(side=LEFT)
+
+
 root.config(menu=menubar)
 root.mainloop()
