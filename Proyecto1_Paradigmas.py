@@ -126,7 +126,7 @@ def menu(root):
     #barra menu
     filemenu = Menu(menubar, tearoff=0)
     #submenu archivo
-    filemenu.add_command(label="Nuevo", command=donothing)
+    filemenu.add_command(label="Nuevo", command=pantallaPrincipal)
     filemenu.add_command(label="Abrir", command=abrirArchivo)
     filemenu.add_command(label="Guardar", command=modificarArchivo)
     filemenu.add_command(label="Guardar como...", command=guardarArchivo)
