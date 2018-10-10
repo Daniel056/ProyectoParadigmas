@@ -12,11 +12,10 @@ import xml.etree.ElementTree as ET
 #===============================================================Seccion de metodos=========================================================================
 textTop = 0 #Guarda el text superior para usarlo en otras funciones
 textBot = 0 #Guarda el text innferior para usarlo en otras funciones
+pathFile = "" #Guarda la dirección del archivo que se abre
 
 #Funcion para mostrar datos en el TextArea
 def writeOnText(inpt):
-    textTop.delete('1.0', END)
-    textTop.update()
     textTop.insert(END, inpt)
 
 #Fncion para obtener el input del Text
@@ -49,7 +48,9 @@ def readXML(path):
 
 #Leer archivos txt y mostrarlos en pantalla
 def readTXT(path):
-    file = open(path, "r") 
+    file = open(path, "r")
+    textTop.delete('1.0', END)
+    textTop.update()
     for line in file:
         writeOnText(line) 
 
@@ -109,8 +110,7 @@ def textArea(root):
     textarea.pack(side=TOP, fill=X)
     scroll.config(command=textarea.yview)
     textarea.config(yscrollcommand=scroll.set)
-    return textarea 
-    
+    return textarea    
 
 #Mostrar el menu en la pantalla
 def menu(root):
