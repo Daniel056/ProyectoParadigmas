@@ -30,18 +30,18 @@ def readXML(path):
     tree = ET.parse(path)  
     root = tree.getroot()
     # atributos de un item
-    print('Item #2 attribute:')  
-    print(root[0][1].attrib)
+    #print('Item #2 attribute:')  
+    #print(root[0][1].attrib)
     # atributos de toddos los items
-    print('\nAll attributes:')  
+    #print('\nAll attributes:')  
     for elem in root:  
         for subelem in elem:
             print(subelem.attrib)
     # dato de un item especifico
-    print('\nItem #2 data:')  
-    print(root[0][1].text)
+    #print('\nItem #2 data:')  
+    #print(root[0][1].text)
     # datos de todos los items
-    print('\nAll item data:')  
+    #print('\nAll item data:')  
     for elem in root:  
         for subelem in elem:
             writeOnText(subelem.text)
