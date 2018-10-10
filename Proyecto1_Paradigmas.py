@@ -6,78 +6,95 @@
 
 #interfaz
 from tkinter import *
-from tkinter.filedialog import askopenfilename
+from tkinter import filedialog
 
-#metodo para agregar a los botones del menu
+#===============================================================Seccion de metodos=============================================================================
 def donothing():
     filewin = TopLevel(root)
     button = Button(filewin, text="Do nothin button")
     button.pack()
 
 #abre el explorador de archivos
-def openFile():
-    filename = askopenfilename() 
-    print (filename)
+def abrirArchivo():
+   filedialog.askopenfilename(initialdir = "/",title = "Abrir archivo",filetypes = (("Text files","*.txt"),("XML files","*.xml"),("all files","*.*")))
+   
+#guardar el archivo como
+def guardarArchivo():
+    filedialog.asksaveasfilename(initialdir = "/",title = "Guardar archivo",filetypes = (("Text files","*.txt"),("XML files","*.xml"),("all files","*.*")))
 
-#pantalla principal
+#==============================================================================================================================================================
+
+
+#================================================================Pantalla principal============================================================================
 root = Tk()
-root.title("IDLE")
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-root.geometry('%sx%s' % (screen_width, screen_height))
+root.title("IDE")
+#screen_width = root.winfo_screenwidth()
+#screen_height = root.winfo_screenheight()
+#root.geometry('%sx%s' % (screen_width, screen_height))
+#root.attributes('-fullscreen', True)
+root.state('zoomed')
+#==============================================================================================================================================================
+
+
+#===================================================================Componentes================================================================================
 
 #barra de menu
 menubar= Menu(root)
 
-#opciones del file menu
+#submenu archivo
 filemenu= Menu(menubar, tearoff=0)
-filemenu.add_command(label="New", command=donothing)
-filemenu.add_command(label="Open", command=openFile)
-filemenu.add_command(label="Save", command=donothing)
-filemenu.add_command(label="Save as...", command=donothing)
-filemenu.add_command(label="Close", command=donothing)
+filemenu.add_command(label="Nuevo", command=donothing)
+filemenu.add_command(label="Abrir", command=abrirArchivo)
+filemenu.add_command(label="Guardar", command=donothing)
+filemenu.add_command(label="Guardar como...", command=guardarArchivo)
 filemenu.add_separator()
-filemenu.add_command(label="Exit", command=root.quit)
-menubar.add_cascade(label="File", menu=filemenu)
+filemenu.add_command(label="Salir", command=root.destroy)
+menubar.add_cascade(label="Archivo", menu=filemenu)
 
-#opciones del edit menu
+#submenu editar
 editmenu = Menu(menubar, tearoff=0)
-editmenu.add_command(label="Undo", command=donothing)
+editmenu.add_command(label="Deshacer", command=donothing)
 editmenu.add_separator()
-editmenu.add_command(label="Cut", command=donothing)
-editmenu.add_command(label="Copy", command=donothing)
-editmenu.add_command(label="Paste", command=donothing)
-editmenu.add_command(label="Delete", command=donothing)
-editmenu.add_command(label="Select All", command=donothing)
-menubar.add_cascade(label="Edit", menu=editmenu)
+editmenu.add_command(label="Cortar", command=donothing)
+editmenu.add_command(label="Copiar", command=donothing)
+editmenu.add_command(label="Pegar", command=donothing)
+editmenu.add_command(label="Seleccionar todo", command=donothing)
+menubar.add_cascade(label="Editar", menu=editmenu)
 
-#opciones del helpmenu
+#submenu ayuda
 helpmenu = Menu(menubar, tearoff=0)
-helpmenu.add_command(label="Help Index", command=donothing)
-helpmenu.add_command(label="About...", command=donothing)
-menubar.add_cascade(label="Help", menu=helpmenu)
+helpmenu.add_command(label="Indice de Ayuda", command=donothing)
+helpmenu.add_command(label="Acerca de...", command=donothing)
+menubar.add_cascade(label="Ayuda", menu=helpmenu)
 
-text = Text(root, height=100, width=175)
+#area de texto y scroll
+scroll= Scrollbar(root)
+textarea = Text(root, height=22, width=170)
+scroll.pack(side=RIGHT, fill=Y)
+textarea.pack(side=TOP, fill=Y)
+scroll.config(command=textarea.yview)
+textarea.config(yscrollcommand=scroll.set)
 
-text.tag_configure('bold_italics', 
-                   font=('Verdana', 12, 'bold', 'italic'))
 
-text.tag_configure('big', 
-                   font=('Verdana', 24, 'bold'))
-text.tag_configure('color', 
-                   foreground='blue', 
-                   font=('Tempus Sans ITC', 14))
+
+#textarea.tag_configure('bold_italics', 
+#                   font=('Verdana', 12, 'bold', 'italic'))
+
+#textarea.tag_configure('big', 
+#                   font=('Verdana', 24, 'bold'))
+#textarea.tag_configure('color', 
+ #                  foreground='blue', 
+ #                  font=('Tempus Sans ITC', 14))
                    
-text.tag_configure('groove', 
-                   relief=GROOVE, 
-                   borderwidth=2)
+#textarea.tag_configure('groove', 
+ #                  relief=GROOVE, 
+  #                 borderwidth=2)
                    
-text.tag_bind('bite', 
-              '<1>', 
-              lambda e, t=text: t.insert(END, "Text"))
+#textarea.tag_bind('bite', 
+ #             '<1>', 
+  #            lambda e, t=textarea: t.insert(END, "Text"))
 
-text.pack(side=LEFT)
-
+#==============================================================================================================================================================
 
 root.config(menu=menubar)
 root.mainloop()
