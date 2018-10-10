@@ -103,13 +103,13 @@ def modificarArchivo():
 #Mostrar el textArea en la pantalla
 def textArea(root):
     scroll = Scrollbar(root)
-    root.textarea = Text(root)
-    root.textarea.pack()
+    textarea = Text(root)
+    textarea.focus_set()
     scroll.pack(side=RIGHT, fill=Y)
-    root.textarea.pack(side=TOP, fill=BOTH)
-    scroll.config(command=root.textarea.yview)
-    root.textarea.config(yscrollcommand=scroll.set)
-    return root.textarea 
+    textarea.pack(side=TOP, fill=X)
+    scroll.config(command=textarea.yview)
+    textarea.config(yscrollcommand=scroll.set)
+    return textarea 
     
 
 #Mostrar el menu en la pantalla
@@ -158,7 +158,7 @@ def pantallaPrincipal():
     textBot = textArea(root)
     root.mainloop()
 
-#===========================================================================================================================================================
+#==========================================================================================================================================================
 
 #==============================================================Pantalla principal==========================================================================
 pantallaPrincipal()
