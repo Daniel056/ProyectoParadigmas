@@ -82,6 +82,8 @@ def donothing():
 #abre el explorador de archivos
 def abrirArchivo():
     path = filedialog.askopenfilename(initialdir = "/",title = "Abrir archivo",filetypes = (("Text file","*.txt"),("XML file","*.xml")))
+    global pathFile
+    pathFile = path
     if (path.endswith('.xml')):
         readXML(path)
     elif (path.endswith('.txt')):
@@ -95,11 +97,17 @@ def guardarArchivo():
     elif (path.endswith('.txt')):
         writeTXT(path)
 
-#Opcion guardar en el menu (implementar)
+#Opcion guardar en el menu
 def modificarArchivo():
-    print("")
-
-
+    print(pathFile)
+    if pathFile != "":
+        if (pathFile.endswith('.xml')):
+            writeXML(pathFile)
+        elif (pathFile.endswith('.txt')):
+            writeTXT(pathFile)
+    else:
+        guardarArchivo()
+    
 
 #Mostrar el textArea en la pantalla
 def textArea(root):
