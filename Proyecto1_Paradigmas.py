@@ -141,7 +141,7 @@ def menu(root):
     menubar.add_cascade(label="Ayuda", menu=helpmenu)
     root.config(menu=menubar)
 
-#Mostrar la pantalla princcipal
+#Mostrar la pantalla principal
 def pantallaPrincipal():
     root = Tk()
     root.title("IDE")
