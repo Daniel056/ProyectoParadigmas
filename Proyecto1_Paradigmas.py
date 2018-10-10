@@ -14,16 +14,16 @@ textTop = 0 #Guarda el text superior para usarlo en otras funciones
 textBot = 0 #Guarda el text innferior para usarlo en otras funciones
 
 #Funcion para mostrar datos en el TextArea
-def writeOnText(str):
+def writeOnText(inpt):
     textTop.delete('1.0', END)
     textTop.update()
-    textTop.insert(END, str)
+    textTop.insert(END, inpt)
 
 #Fncion para obtener el input del Text
 def retrieveInput():
-    input = textTop.get("1.0",'end-1c')
-    print(input)
-    return input
+    inpt = textTop.get("1.0",'end-1c')
+    print(inpt)
+    return inpt
 
 #Leer archivos xml y mostrarlos en pantalla
 def readXML(path):
