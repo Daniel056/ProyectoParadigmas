@@ -9,7 +9,22 @@ from tkinter import *
 from tkinter import filedialog
 import xml.etree.ElementTree as ET 
 
-#===============================================================Seccion de metodos=============================================================================
+#===============================================================Seccion de metodos=========================================================================
+text = 0 #Guarda el text para usarlo en otras funciones
+
+#Funcion para mostrar datos en el TextArea
+def writeOnText(str):
+    text.delete('1.0', END)
+    text.update()
+    text.insert(END, str)
+
+#Fncion para obtener el input del Text
+def retrieveInput():
+    input = text.get("1.0",'end-1c')
+    print(input)
+    return input
+
+#Leer archivos xml y mostrarlos en pantalla
 def readXML(path):
     tree = ET.parse(path)  
     root = tree.getroot()
@@ -28,13 +43,16 @@ def readXML(path):
     print('\nAll item data:')  
     for elem in root:  
         for subelem in elem:
-            print(subelem.text)
+            writeOnText(subelem.text)
+        writeOnText("\n")
 
+#Leer archivos txt y mostrarlos en pantalla
 def readTXT(path):
     file = open(path, "r") 
-    for line in file: 
-        print (line), 
+    for line in file:
+        writeOnText(line) 
 
+#Crear y guarddar archivos xml (ver e implementar el formato del los xml)
 def writeXML(path):
     data = ET.Element('data')  
     items = ET.SubElement(data, 'items')  
@@ -48,10 +66,10 @@ def writeXML(path):
     myfile = open(path, "wb")  
     myfile.write(ET.tostring(data))
 
+#Crear y guardar archivos txt
 def writeTXT(path):
     file = open(path,"w")
-    file.write("Prueba") 
-    file.write("escrbir algo") 
+    file.write(retrieveInput())
     file.close() 
 
 def donothing():
@@ -75,9 +93,11 @@ def guardarArchivo():
     elif (path.endswith('.txt')):
         writeTXT(path)
 
+#Opcion guardar en el menu (implementar)
 def modificarArchivo():
-    
+    print("")
 
+#Mostrar el textArea en la pantalla
 def textArea(root):
     scroll= Scrollbar(root)
     textarea = Text(root, height=22, width=170)
@@ -85,6 +105,7 @@ def textArea(root):
     textarea.pack(side=TOP, fill=Y)
     scroll.config(command=textarea.yview)
     textarea.config(yscrollcommand=scroll.set)
+    return textarea 
     #textarea.tag_configure('bold_italics', 
     #                   font=('Verdana', 12, 'bold', 'italic'))
 
@@ -101,7 +122,9 @@ def textArea(root):
     #textarea.tag_bind('bite', 
      #             '<1>', 
       #            lambda e, t=textarea: t.insert(END, "Text"))
+    
 
+#Mostrar el menu en la pantalla
 def menu(root):
     menubar = Menu(root)
     #barra menu
@@ -130,6 +153,7 @@ def menu(root):
     menubar.add_cascade(label="Ayuda", menu=helpmenu)
     root.config(menu=menubar)
 
+#Mostrar la pantalla princcipal
 def pantallaPrincipal():
     root = Tk()
     root.title("IDE")
@@ -141,7 +165,8 @@ def pantallaPrincipal():
     #menu principal y submenus
     menu(root)
     #area de texto y scroll
-    textArea(root)
+    global text
+    text = textArea(root)
     root.mainloop()
 
 #===========================================================================================================================================================
@@ -151,5 +176,5 @@ pantallaPrincipal()
 
 
 
-#==============================================================================================================================================================
+#==========================================================================================================================================================
 
