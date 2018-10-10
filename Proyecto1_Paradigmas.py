@@ -10,17 +10,18 @@ from tkinter import filedialog
 import xml.etree.ElementTree as ET 
 
 #===============================================================Seccion de metodos=========================================================================
-text = 0 #Guarda el text para usarlo en otras funciones
+textTop = 0 #Guarda el text superior para usarlo en otras funciones
+textBot = 0 #Guarda el text innferior para usarlo en otras funciones
 
 #Funcion para mostrar datos en el TextArea
 def writeOnText(str):
-    text.delete('1.0', END)
-    text.update()
-    text.insert(END, str)
+    textTop.delete('1.0', END)
+    textTop.update()
+    textTop.insert(END, str)
 
 #Fncion para obtener el input del Text
 def retrieveInput():
-    input = text.get("1.0",'end-1c')
+    input = textTop.get("1.0",'end-1c')
     print(input)
     return input
 
@@ -97,31 +98,18 @@ def guardarArchivo():
 def modificarArchivo():
     print("")
 
+
+
 #Mostrar el textArea en la pantalla
 def textArea(root):
-    scroll= Scrollbar(root)
-    textarea = Text(root, height=22, width=170)
+    scroll = Scrollbar(root)
+    root.textarea = Text(root)
+    root.textarea.pack()
     scroll.pack(side=RIGHT, fill=Y)
-    textarea.pack(side=TOP, fill=Y)
-    scroll.config(command=textarea.yview)
-    textarea.config(yscrollcommand=scroll.set)
-    return textarea 
-    #textarea.tag_configure('bold_italics', 
-    #                   font=('Verdana', 12, 'bold', 'italic'))
-
-    #textarea.tag_configure('big', 
-    #                   font=('Verdana', 24, 'bold'))
-    #textarea.tag_configure('color', 
-     #                  foreground='blue', 
-     #                  font=('Tempus Sans ITC', 14))
-                       
-    #textarea.tag_configure('groove', 
-     #                  relief=GROOVE, 
-      #                 borderwidth=2)
-                       
-    #textarea.tag_bind('bite', 
-     #             '<1>', 
-      #            lambda e, t=textarea: t.insert(END, "Text"))
+    root.textarea.pack(side=TOP, fill=BOTH)
+    scroll.config(command=root.textarea.yview)
+    root.textarea.config(yscrollcommand=scroll.set)
+    return root.textarea 
     
 
 #Mostrar el menu en la pantalla
@@ -165,8 +153,9 @@ def pantallaPrincipal():
     #menu principal y submenus
     menu(root)
     #area de texto y scroll
-    global text
-    text = textArea(root)
+    global textTop, textBot
+    textTop = textArea(root)
+    textBot = textArea(root)
     root.mainloop()
 
 #===========================================================================================================================================================
