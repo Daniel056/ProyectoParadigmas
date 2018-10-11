@@ -185,13 +185,107 @@ def menu(root):
 
 def alpha():
     textTop.insert(END, "α")
-    
+
+def beta():
+    textTop.insert(END, "β")
+
+def gamma():
+    textTop.insert(END, "γ")
+
+def delta():
+    textTop.insert(END, "δ")
+
+def epsilon():
+    textTop.insert(END, "ε")
+
+def zeta():
+    textTop.insert(END, "ζ")
+
+def eta():
+    textTop.insert(END, "η")
+
+def theta():
+    textTop.insert(END, "θ")
+
+def iota():
+    textTop.insert(END, "ι")
+
+def kappa():
+    textTop.insert(END, "κ")
+
+def lamda():
+    textTop.insert(END, "λ")
+
+def lamda3():
+    textTop.insert(END, "Λ^3")
+
+def mu():
+    textTop.insert(END, "μ")
+
+def nu():
+    textTop.insert(END, "ν")
+
+def xi():
+    textTop.insert(END, "ξ")
+
+def omicron():
+    textTop.insert(END, "ο")
+
+def pi():
+    textTop.insert(END, "π")
+
+def rho():
+    textTop.insert(END, "ρ")
+
+def sigma():
+    textTop.insert(END, "σ")
+
+def tau():
+    textTop.insert(END, "τ")
+
+def upsilon():
+    textTop.insert(END, "υ")
+
+def phi():
+    textTop.insert(END, "φ")
+
+def chi():
+    textTop.insert(END, "χ")
+
+def psi():
+    textTop.insert(END, "ψ")
+
+def omega():
+    textTop.insert(END, "ω")
+
 def toolbar(root):
    mb = Menubutton(root, text="Caracteres especiales")
    mb.menu = Menu(mb)
    mb["menu"] = mb.menu
 
-   mb.menu.add_command(label="α", command=alpha)
+   mb.menu.add_command(label="α (alpha)", command=alpha)
+   mb.menu.add_command(label="β (beta)", command=beta)
+   mb.menu.add_command(label="γ (gamma)", command=gamma)
+   mb.menu.add_command(label="δ (delta)", command=delta)
+   mb.menu.add_command(label="ζ (zeta)", command=zeta)
+   mb.menu.add_command(label="η (eta)", command=eta)
+   mb.menu.add_command(label="θ (theta)", command=theta)
+   mb.menu.add_command(label="κ (kappa)", command=kappa)
+   mb.menu.add_command(label="λ (lambda)", command=lamda)
+   mb.menu.add_command(label="Λ^3 (lambda^3)", command=lamda3)
+   mb.menu.add_command(label="μ (mu)", command=mu)
+   mb.menu.add_command(label="ν (nu)", command=nu)
+   mb.menu.add_command(label="ξ (xi)", command=xi)
+   mb.menu.add_command(label="ο (omicron)", command=omicron)
+   mb.menu.add_command(label="π (pi)", command=pi)
+   mb.menu.add_command(label="ρ (rho)", command=rho)
+   mb.menu.add_command(label="σ (sigma)", command=sigma)
+   mb.menu.add_command(label="τ (tau)", command=tau)
+   mb.menu.add_command(label="υ (upsilon)", command=upsilon)
+   mb.menu.add_command(label="φ (phi)", command=phi)
+   mb.menu.add_command(label="χ (chi)", command=chi)
+   mb.menu.add_command(label="ψ (psi)", command=psi)
+   mb.menu.add_command(label="ω (omega)", command=omega)
    mb.pack()
 
     
