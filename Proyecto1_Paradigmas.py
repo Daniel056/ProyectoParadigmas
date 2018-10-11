@@ -120,6 +120,7 @@ def textArea(root):
     textarea.config(yscrollcommand=scroll.set)
     return textarea
 
+#Metodos del menú editar para el TextTop
 def copy():
     textTop.clipboard_clear()
     text = textTop.get("sel.first", "sel.last")
@@ -149,10 +150,11 @@ def redo():
 
 #Mostrar el menu en la pantalla
 def menu(root):
-    menubar = Menu(root)
     #barra menu
-    filemenu = Menu(menubar, tearoff=0)
+    menubar = Menu(root)
+
     #submenu archivo
+    filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Nuevo", command=pantallaPrincipal)
     filemenu.add_command(label="Abrir", command=abrirArchivo)
     filemenu.add_separator()
@@ -161,8 +163,9 @@ def menu(root):
     filemenu.add_separator()
     filemenu.add_command(label="Salir", command=root.destroy)
     menubar.add_cascade(label="Archivo", menu=filemenu)
-    editmenu = Menu(menubar, tearoff=0)
+
     #submenu editar
+    editmenu = Menu(menubar, tearoff=0)
     editmenu.add_command(label="Deshacer", command=undo)
     editmenu.add_command(label="Rehacer", command=redo)
     editmenu.add_separator()
@@ -172,12 +175,26 @@ def menu(root):
     editmenu.add_command(label="Seleccionar todo", command=selectAll)
     editmenu.add_command(label="Deseleccionar todo", command=deselectAll)
     menubar.add_cascade(label="Editar", menu=editmenu)
-    helpmenu = Menu(menubar, tearoff=0)
+
     #submenu ayuda
+    helpmenu = Menu(menubar, tearoff=0)
     helpmenu.add_command(label="Indice de Ayuda", command=donothing)
     helpmenu.add_command(label="Acerca de...", command=donothing)
     menubar.add_cascade(label="Ayuda", menu=helpmenu)
     root.config(menu=menubar)
+
+def alpha():
+    textTop.insert(END, "α")
+    
+def toolbar(root):
+   mb = Menubutton(root, text="Caracteres especiales")
+   mb.menu = Menu(mb)
+   mb["menu"] = mb.menu
+
+   mb.menu.add_command(label="α", command=alpha)
+   mb.pack()
+
+    
 
 #Mostrar la pantalla principal
 def pantallaPrincipal():
@@ -190,6 +207,7 @@ def pantallaPrincipal():
     root.state('zoomed')
     #menu principal y submenus
     menu(root)
+    toolbar(root)
     #area de texto y scroll
     global textTop, textBot
     textTop = textArea(root)
