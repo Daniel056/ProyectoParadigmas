@@ -112,13 +112,40 @@ def modificarArchivo():
 #Mostrar el textArea en la pantalla
 def textArea(root):
     scroll = Scrollbar(root)
-    textarea = Text(root)
+    textarea = Text(root, undo=True)
     textarea.focus_set()
     scroll.pack(side=RIGHT, fill=Y)
     textarea.pack(side=TOP, fill=X)
     scroll.config(command=textarea.yview)
     textarea.config(yscrollcommand=scroll.set)
-    return textarea    
+    return textarea
+
+def copy():
+    textTop.clipboard_clear()
+    text = textTop.get("sel.first", "sel.last")
+    textTop.clipboard_append(text)
+
+def cut():
+    copy()
+    textTop.delete("sel.first", "sel.last")
+
+def paste():
+    text=textTop.selection_get(selection='CLIPBOARD')
+    textTop.insert('insert', text)
+
+def selectAll():
+    textTop.tag_add("sel", '1.0', 'end')
+    return
+
+def deselectAll():
+    textTop.tag_remove("sel", '1.0', 'end')
+    return
+
+def undo():
+    textTop.edit_undo()
+
+def redo():
+    textTop.edit_redo()
 
 #Mostrar el menu en la pantalla
 def menu(root):
@@ -128,6 +155,7 @@ def menu(root):
     #submenu archivo
     filemenu.add_command(label="Nuevo", command=pantallaPrincipal)
     filemenu.add_command(label="Abrir", command=abrirArchivo)
+    filemenu.add_separator()
     filemenu.add_command(label="Guardar", command=modificarArchivo)
     filemenu.add_command(label="Guardar como...", command=guardarArchivo)
     filemenu.add_separator()
@@ -135,12 +163,14 @@ def menu(root):
     menubar.add_cascade(label="Archivo", menu=filemenu)
     editmenu = Menu(menubar, tearoff=0)
     #submenu editar
-    editmenu.add_command(label="Deshacer", command=donothing)
+    editmenu.add_command(label="Deshacer", command=undo)
+    editmenu.add_command(label="Rehacer", command=redo)
     editmenu.add_separator()
-    editmenu.add_command(label="Cortar", command=donothing)
-    editmenu.add_command(label="Copiar", command=donothing)
-    editmenu.add_command(label="Pegar", command=donothing)
-    editmenu.add_command(label="Seleccionar todo", command=donothing)
+    editmenu.add_command(label="Cortar", command=cut)
+    editmenu.add_command(label="Copiar", command=copy)
+    editmenu.add_command(label="Pegar", command=paste)
+    editmenu.add_command(label="Seleccionar todo", command=selectAll)
+    editmenu.add_command(label="Deseleccionar todo", command=deselectAll)
     menubar.add_cascade(label="Editar", menu=editmenu)
     helpmenu = Menu(menubar, tearoff=0)
     #submenu ayuda
