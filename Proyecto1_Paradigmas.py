@@ -8,20 +8,62 @@
 from tkinter import *
 from tkinter import filedialog
 import xml.etree.ElementTree as ET 
-
+import re
 #===============================================================Seccion de metodos=========================================================================
 textTop = 0 #Guarda el text superior para usarlo en otras funciones
 textBot = 0 #Guarda el text innferior para usarlo en otras funciones
 pathFile = "" #Guarda la dirección del archivo que se abre
+algoritmoMarkov = "" #Guarda los parametros del algoritmo al "ejecutarlo"
+
+regularExpression = r"""(?mx)
+^(?: 
+  (?: (?P<comment> \% .* ) ) |
+  (?: (?P<blank>   \s*  ) (?: \n | $ )  ) |
+  (?: (?P<rule>    (?P<patron> .+? ) \s+ -> \s+ (?P<term> \.)? (?P<remp> .+) ) )
+)$
+""" #Formato con el que se ejecuta el algoritmo
+
+#Devuelve cada regla del algoritmo ingresado
+def getReemplazos(entrada):
+    return [ (matchobj.group('patron'), matchobj.group('remp'), bool(matchobj.group('term')))
+                for matchobj in re.finditer(regularExpression, entrada)
+                if matchobj.group('rule')]
+
+#Reemplaza la entrada por cada de cada regla
+def markov(text, reemplazos):
+    writeOnText(text + "\n", textBot)
+    while True:
+        for patron, remp, term in reemplazos:
+            if patron in text:
+                text = text.replace(patron, remp, 1)
+                writeOnText(text + " ", textBot)
+                writeOnText("(Aplicando " + patron + " -> " + remp + ")\n", textBot)
+                if term:
+                    return text
+                break
+        else:
+            return text
+
+
+def exeMarkov():
+    global algoritmoMarkov
+    algoritmoMarkov = retrieveInput(textTop)
+    entrada = retrieveInput(textBot)
+    textBot.delete('1.0', END)
+    textBot.update()
+    if entrada != "":
+        markov(entrada, getReemplazos(algoritmoMarkov))
+    else:
+        textBot.insert(END, "NO HAY HILERA DE ENTRADA!!")
+    
 
 #Funcion para mostrar datos en el TextArea
-def writeOnText(inpt):
-    textTop.insert(END, inpt)
+def writeOnText(inpt, text):
+    text.insert(END, inpt)
 
 #Fncion para obtener el input del Text
-def retrieveInput():
-    inpt = textTop.get("1.0",'end-1c')
-    print(inpt)
+def retrieveInput(text):
+    inpt = text.get("1.0",'end-1c')
     return inpt
 
 #Leer archivos xml y mostrarlos en pantalla
@@ -43,8 +85,8 @@ def readXML(path):
     #print('\nAll item data:')  
     for elem in root:  
         for subelem in elem:
-            writeOnText(subelem.text)
-        writeOnText("\n")
+            writeOnText(subelem.text, textTop)
+        writeOnText("\n", textTop)
 
 #Leer archivos txt y mostrarlos en pantalla
 def readTXT(path):
@@ -52,7 +94,7 @@ def readTXT(path):
     textTop.delete('1.0', END)
     textTop.update()
     for line in file:
-        writeOnText(line) 
+        writeOnText(line, textTop) 
 
 #Crear y guarddar archivos xml (ver e implementar el formato del los xml)
 def writeXML(path):
@@ -71,7 +113,7 @@ def writeXML(path):
 #Crear y guardar archivos txt
 def writeTXT(path):
     file = open(path,"w")
-    file.write(retrieveInput())
+    file.write(retrieveInput(textTop))
     file.close() 
 
 def donothing():
@@ -178,7 +220,7 @@ def menu(root):
 
     #submenu ayuda
     helpmenu = Menu(menubar, tearoff=0)
-    helpmenu.add_command(label="Indice de Ayuda", command=donothing)
+    helpmenu.add_command(label="Indice de Ayuda", command=exeMarkov)
     helpmenu.add_command(label="Acerca de...", command=donothing)
     menubar.add_cascade(label="Ayuda", menu=helpmenu)
     root.config(menu=menubar)
@@ -303,7 +345,8 @@ def pantallaPrincipal():
     menu(root)
     toolbar(root)
     #area de texto y scroll
-    global textTop, textBot
+    global textTop
+    global textBot
     textTop = textArea(root)
     textBot = textArea(root)
     root.mainloop()

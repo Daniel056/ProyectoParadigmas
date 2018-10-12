@@ -1,0 +1,10 @@
+% Slightly modified from the rules on Wikipedia
+A -> apple
+B -> bag
+S -> .shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule
+
+%La sigte linea es la que se pega en el text de abajo sin "%"
+%I bought a B of As from T S.
