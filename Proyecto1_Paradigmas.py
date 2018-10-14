@@ -25,9 +25,11 @@ regularExpression = r"""(?mx)
 
 #Devuelve cada regla del algoritmo ingresado
 def getReemplazos(entrada):
-    return [ (matchobj.group('patron'), matchobj.group('remp'), bool(matchobj.group('term')))
-                for matchobj in re.finditer(regularExpression, entrada)
-                if matchobj.group('rule')]
+    reemplazos = []
+    for matchobj in re.finditer(syntaxre, entrada):
+        if matchobj.group('rule'):
+            reemplazos.append((matchobj.group('patron'), matchobj.group('remp'), bool(matchobj.group('term'))))
+    return reemplazos
 
 #Reemplaza la entrada por cada de cada regla
 def markov(text, reemplazos):
