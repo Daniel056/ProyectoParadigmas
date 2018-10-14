@@ -26,7 +26,7 @@ regularExpression = r"""(?mx)
 #Devuelve cada regla del algoritmo ingresado
 def getReemplazos(entrada):
     reemplazos = []
-    for matchobj in re.finditer(syntaxre, entrada):
+    for matchobj in re.finditer(regularExpression, entrada):
         if matchobj.group('rule'):
             reemplazos.append((matchobj.group('patron'), matchobj.group('remp'), bool(matchobj.group('term'))))
     return reemplazos
@@ -54,9 +54,12 @@ def exeMarkov():
     textBot.delete('1.0', END)
     textBot.update()
     if entrada != "":
-        markov(entrada, getReemplazos(algoritmoMarkov))
+        if algoritmoMarkov != "":
+            markov(entrada, getReemplazos(algoritmoMarkov))
+        else:
+            textTop.insert(END, "NO SE HA INTRODUCIDO UN ALGORITMO!")
     else:
-        textBot.insert(END, "NO HAY HILERA DE ENTRADA!!")
+        textBot.insert(END, "NO SE HA INTRODUCIDO UNA HILERA DE ENTRADA!!")
     
 
 #Funcion para mostrar datos en el TextArea
