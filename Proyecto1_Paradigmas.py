@@ -223,12 +223,19 @@ def menu(root):
     editmenu.add_command(label="Deseleccionar todo", command=deselectAll)
     menubar.add_cascade(label="Editar", menu=editmenu)
 
+    #submenu depurar
+    runmenu = Menu(menubar, tearoff=0)
+    runmenu.add_command(label="Ejecutar", command=exeMarkov)
+    menubar.add_cascade(label="Depurar", menu=runmenu)
+
     #submenu ayuda
     helpmenu = Menu(menubar, tearoff=0)
-    helpmenu.add_command(label="Indice de Ayuda", command=exeMarkov)
+    helpmenu.add_command(label="Indice de Ayuda", command=donothing)
     helpmenu.add_command(label="Acerca de...", command=donothing)
     menubar.add_cascade(label="Ayuda", menu=helpmenu)
     root.config(menu=menubar)
+
+    
 
 def alpha():
     textTop.insert(END, "α")
