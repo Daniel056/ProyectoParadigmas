@@ -133,7 +133,7 @@ def abrirArchivo():
     pathFile = path
     if (path.endswith('.xml')):
         readXML(path)
-    elif (path.endswith('.txt')):
+    else (path.endswith('.txt')):
         readTXT(path)
    
 #guardar el archivo como
@@ -143,6 +143,9 @@ def guardarArchivo():
         writeXML(path)
     elif (path.endswith('.txt')):
         writeTXT(path)
+    else:
+        path = path + ".txt"
+        writeTXT(path)
 
 #Opcion guardar en el menu
 def modificarArchivo():
@@ -150,7 +153,7 @@ def modificarArchivo():
     if pathFile != "":
         if (pathFile.endswith('.xml')):
             writeXML(pathFile)
-        elif (pathFile.endswith('.txt')):
+        else (pathFile.endswith('.txt')):
             writeTXT(pathFile)
     else:
         guardarArchivo()
