@@ -17,35 +17,138 @@ algoritmoMarkov = "" #Guarda los parametros del algoritmo al "ejecutarlo"
 
 regularExpression = r"""(?mx)
 ^(?: 
-  (?: (?P<comment> \% .* ) ) |
-  (?: (?P<blank>   \s*  ) (?: \n | $ )  ) |
-  (?: (?P<rule>    (?P<patron> .+? ) \s+ -> \s+ (?P<term> \.)? (?P<remp> .+) ) )
-)$
+  (?: (?P<comment> \% .*)) |
+  (?: (?P<blank> \s*) (?: \n | $)) |
+  (?: (?P<symbols> \#symbols .+)) |
+  (?: (?P<vars> \#vars .+)) |
+  (?: (?P<markers> \#markers .+)) |
+  (?: (?P<rule> (?P<label> \_.+\:)? (?P<patron> .+?) \s+ -> \s+ (?P<term> \.)? (?P<remp> .+)))
+ )$
 """ #Formato con el que se ejecuta el algoritmo
 
 #Devuelve cada regla del algoritmo ingresado
 def getReemplazos(entrada):
     reemplazos = []
-    for matchobj in re.finditer(regularExpression, entrada):
-        if matchobj.group('rule'):
-            reemplazos.append((matchobj.group('patron'), matchobj.group('remp'), bool(matchobj.group('term'))))
+    s = 0
+    v = 0
+    m = 0
+    for reobj in re.finditer(syntaxre, entrada):
+        if s == 0:
+            if bool(reobj.group('symbols')):
+                symbols = reobj.group('symbols')[9:]
+                if (symbols != ""):
+                    s += 1
+        if v == 0:
+            if bool(reobj.group('vars')):
+                var = reobj.group('vars')[6:]
+                if (var != ""):
+                    v += 1
+        if m == 0:
+            if bool(reobj.group('markers')):
+                markers = reobj.group('markers')[9:]
+                if (markers != ""):
+                    m += 1
+        if reobj.group('rule'):
+            if (reobj.group('label')):
+                remp = sepPatron(reobj.group('remp'))
+                lbl = getLbl(reobj.group('remp'))
+                reemplazos.append((reobj.group('label'), reobj.group('patron'), remp, bool(reobj.group('term')), lbl))
+            else:
+                reemplazos.append(("", reobj.group('patron'), reobj.group('remp'), bool(reobj.group('term')), ""))
+    if (s == 0):
+        symbols = "abcdefghijklmnopqrstuvwxyz0123456789"
+    if (v == 0):
+        var = "wxyz"
+    if (m == 0):
+        markers = "αβγδ"
+    reemplazos.append(symbols)
+    reemplazos.append(var)
+    reemplazos.append(markers)
     return reemplazos
 
 #Reemplaza la entrada por cada de cada regla
 def markov(text, reemplazos):
     writeOnText(text + "\n", textBot)
-    while True:
-        for patron, remp, term in reemplazos:
-            if patron in text:
-                text = text.replace(patron, remp, 1)
-                writeOnText(text + " ", textBot)
-                writeOnText("(Aplicando " + patron + " -> " + remp + ")\n", textBot)
-                if term:
-                    return text
-                break
-        else:
-            return text
+    symbols = reemplazos [len(reemplazos) - 3]
+    var = reemplazos [len(reemplazos) - 2]
+    markers = reemplazos [len(reemplazos) - 1]
+    if checkSymbols(text, symbols, markers) == 1:
+        print (text)
+        while True:
+            i = 0
+            while i < len(reemplazos) - 3:
+                label = reemplazos[i][0]
+                patron = reemplazos[i][1]
+                remp = reemplazos[i][2]
+                term = reemplazos[i][3]
+                lbl = reemplazos[i][4][1:]
+                lbl = lbl[:len(lbl) - 1]
+                i += 1
+                if lbl == "":
+                    if patron in text:
+                        text = text.replace(patron, remp, 1)
+                        print (label[1:] + patron + "->" + remp + lbl)
+                        print(text)
+                        if term:
+                            return text
+                        break
+                else:
+                    for x in range (0, (len(reemplazos)) - 3):
+                        if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl:
+                            label = reemplazos[x][0][:len(reemplazos[x][0]) - 1]
+                            patron = reemplazos[x][1]
+                            remp = reemplazos[x][2]
+                            term = reemplazos[x][3]
+                            lbl = reemplazos[x][4][1:]
+                            lbl = lbl[:len(lbl) - 1]
+                            i = x
+                            if patron in text:
+                                text = text.replace(patron, remp, 1)
+                                print (label[1:] + ": " + patron + "->" + remp + " " + "(" + lbl[1:] + ")")
+                                print(text)
+                                i += 1
+                                if term:
+                                    return text
+                                break
+            else:
+                return text
+    else:
+        print ("No coincide el alfabeto")
 
+def checkSymbols(text, symbols, markers):
+    result = 1
+    for x in text:
+        if x in markers:
+            result = 1
+        elif x.lower() in symbols:
+            result = 1
+        elif x != " " and x != ".":
+            result = 0
+            break
+    return result
+
+def getLbl(remp):
+    i = 0
+    r = ""
+    if "(_" in remp:
+        while i < len(remp):
+            if remp[i] == "(" and remp[i + 1] == "_" :
+                break
+            else:
+                i += 1
+        r = remp[i:]
+    return r
+
+def sepPatron(remp):
+    i = 0
+    r = ""
+    while i < len(remp):
+        if remp[i] == "(" and remp[i + 1] == "_" :
+            break
+        else:
+            i += 1
+    r = remp[:i]
+    return r
 
 def exeMarkov():
     global algoritmoMarkov
@@ -133,7 +236,7 @@ def abrirArchivo():
     pathFile = path
     if (path.endswith('.xml')):
         readXML(path)
-    else (path.endswith('.txt')):
+    else:
         readTXT(path)
    
 #guardar el archivo como
@@ -153,7 +256,7 @@ def modificarArchivo():
     if pathFile != "":
         if (pathFile.endswith('.xml')):
             writeXML(pathFile)
-        else (pathFile.endswith('.txt')):
+        else:
             writeTXT(pathFile)
     else:
         guardarArchivo()
