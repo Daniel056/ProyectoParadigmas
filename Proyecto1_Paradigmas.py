@@ -330,7 +330,8 @@ def writeXML(path):
 
 #Crear y guardar archivos txt
 def writeTXT(path):
-    file = open(path,"w")
+    encoding = 'utf8'
+    file = open(path,"w", encoding=encoding)
     file.write(retrieveInput(textTop))
     file.close() 
 
