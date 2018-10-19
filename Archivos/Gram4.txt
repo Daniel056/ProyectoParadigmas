@@ -1,6 +1,8 @@
 % Unary Multiplication Engine, for testing Markov Algorithm implementations
 % By Donal Fellows.
 % Unary addition engine
+#symbols _0123456789+*xy
+#markers XY@,!
 _+1 -> _1+
 1+1 -> 11+
 % Pass for converting from the splitting of multiplication into ordinary
@@ -29,3 +31,5 @@ _+_ ->
 
 %La sigte linea es la que se pega en el text de abajo sin "%"
 %_1111*11111_
+
+NO COINCIDE EL ALFABETO

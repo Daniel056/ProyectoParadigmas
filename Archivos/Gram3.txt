@@ -8,7 +8,6 @@ W -> WW
 S -> .shop
 T -> the
 the shop -> my brother
-a never used -> .terminating rule
 
 %La sigte linea es la que se pega en el text de abajo sin "%"
 %I bought a B of As W my Bgage from T S.

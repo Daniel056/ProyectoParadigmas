@@ -32,7 +32,7 @@ def getReemplazos(entrada):
     s = 0
     v = 0
     m = 0
-    for reobj in re.finditer(syntaxre, entrada):
+    for reobj in re.finditer(regularExpression, entrada):
         if s == 0:
             if bool(reobj.group('symbols')):
                 symbols = reobj.group('symbols')[9:]
@@ -68,12 +68,11 @@ def getReemplazos(entrada):
 
 #Reemplaza la entrada por cada de cada regla
 def markov(text, reemplazos):
-    writeOnText(text + "\n", textBot)
+    writeOnText("Entrada: " + text + "\n", textBot)
     symbols = reemplazos [len(reemplazos) - 3]
     var = reemplazos [len(reemplazos) - 2]
     markers = reemplazos [len(reemplazos) - 1]
     if checkSymbols(text, symbols, markers) == 1:
-        print (text)
         while True:
             i = 0
             while i < len(reemplazos) - 3:
@@ -87,8 +86,9 @@ def markov(text, reemplazos):
                 if lbl == "":
                     if patron in text:
                         text = text.replace(patron, remp, 1)
-                        print (label[1:] + patron + "->" + remp + lbl)
-                        print(text)
+                        writeOnText(text + "\t\t\t\t", textBot)
+                        writeOnText("(Aplicando " + label[1:] + patron + "->" + remp + lbl + ")", textBot)
+                        writeOnText("\n", textBot)
                         if term:
                             return text
                         break
@@ -104,16 +104,18 @@ def markov(text, reemplazos):
                             i = x
                             if patron in text:
                                 text = text.replace(patron, remp, 1)
-                                print (label[1:] + ": " + patron + "->" + remp + " " + "(" + lbl[1:] + ")")
-                                print(text)
+                                writeOnText(text + "\t\t\t\t", textBot)
+                                writeOnText("(Aplicando " + label[1:] + ": " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                                writeOnText("\n", textBot)
                                 i += 1
                                 if term:
                                     return text
                                 break
             else:
+                writeOnText("Salida: " + text, textBot)
                 return text
     else:
-        print ("No coincide el alfabeto")
+        writeOnText("\n\nNo coincide el alfabeto".upper(), textTop)
 
 def checkSymbols(text, symbols, markers):
     result = 1
@@ -232,6 +234,8 @@ def donothing():
 #abre el explorador de archivos
 def abrirArchivo():
     path = filedialog.askopenfilename(initialdir = "/",title = "Abrir archivo",filetypes = (("Text file","*.txt"),("XML file","*.xml")))
+    textBot.delete('1.0', END)
+    textBot.update()
     global pathFile
     pathFile = path
     if (path.endswith('.xml')):
@@ -242,6 +246,7 @@ def abrirArchivo():
 #guardar el archivo como
 def guardarArchivo():
     path = filedialog.asksaveasfilename(initialdir = "/",title = "Guardar archivo",filetypes = (("Text files","*.txt"),("XML files","*.xml")))
+    pathFile = path
     if (path.endswith('.xml')):
         writeXML(path)
     elif (path.endswith('.txt')):
@@ -252,7 +257,6 @@ def guardarArchivo():
 
 #Opcion guardar en el menu
 def modificarArchivo():
-    print(pathFile)
     if pathFile != "":
         if (pathFile.endswith('.xml')):
             writeXML(pathFile)
@@ -454,10 +458,6 @@ def toolbar(root):
 def pantallaPrincipal():
     root = Tk()
     root.title("IDE")
-    #screen_width = root.winfo_screenwidth()
-    #screen_height = root.winfo_screenheight()
-    #root.geometry('%sx%s' % (screen_width, screen_height))
-    #root.attributes('-fullscreen', True)
     root.state('zoomed')
     #menu principal y submenus
     menu(root)
