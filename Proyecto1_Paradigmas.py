@@ -262,7 +262,8 @@ def readXML(path):
     root = tree.getroot()
     for elem in root:  
         for subelem in elem:
-            writeOnText(subelem.text + "\n", textTop)
+            writeOnText(subelem.text, textTop)
+            writeOnText("\n", textTop)
         writeOnText("\n", textTop)
 
 #Leer archivos txt y mostrarlos en pantalla
@@ -278,9 +279,6 @@ def writeXML(path):
     markov = ET.Element('markov')
     text = retrieveInput(textTop)
     comments = ET.SubElement(markov, 'comments')
-    symbols = ET.SubElement(markov, 'symbols')
-    markers = ET.SubElement(markov, 'markers')
-    vars1 = ET.SubElement(markov, 'vars')
     rules = ET.SubElement(markov, 'rules')
     i = 0
     strg = ""
@@ -294,18 +292,21 @@ def writeXML(path):
             comment = ET.SubElement(comments, 'comment')
             comment.text = strg
         elif i < len(text) and text[i] == "#" and text[i + 1] == "s":
+            symbols = ET.SubElement(markov, 'symbols')
             x = i
             while i < len(text) and text[i] != "\n":
                 i += 1
             strg = text[x:i]
             symbols.text = strg
         elif i < len(text) and text[i] == "#" and text[i + 1] == "m":
+            markers = ET.SubElement(markov, 'markers')
             x = i
             while i < len(text) and text[i] != "\n":
                 i += 1
             strg = text[x:i]
             markers.text = strg
         elif i < len(text) and text[i] == "#" and text[i + 1] == "v":
+            vars1 = ET.SubElement(markov, 'vars')
             x = i
             while i < len(text) and text[i] != "\n":
                 i += 1
