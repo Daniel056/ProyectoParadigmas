@@ -52,8 +52,13 @@ def getReemplazos(entrada):
             if (reobj.group('label')):
                 remp = sepPatron(reobj.group('remp'))
                 lbl = getLbl(reobj.group('remp'))
+                if "Λ" in remp:
+                    remp = remp.replace("Λ", "", 1)
                 reemplazos.append((reobj.group('label'), reobj.group('patron'), remp, bool(reobj.group('term')), lbl))
             else:
+                remp = reobj.group('remp')
+                if "Λ" in remp:
+                    remp = remp.replace("Λ", "", 1)
                 reemplazos.append(("", reobj.group('patron'), reobj.group('remp'), bool(reobj.group('term')), ""))
     if (s == 0):
         symbols = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -439,8 +444,8 @@ def kappa():
 def lamda():
     textTop.insert(END, "λ")
 
-def lamda3():
-    textTop.insert(END, "Λ^3")
+def lamdaM():
+    textTop.insert(END, "Λ")
 
 def mu():
     textTop.insert(END, "μ")
@@ -495,7 +500,7 @@ def toolbar(root):
    mb.menu.add_command(label="θ (theta)", command=theta)
    mb.menu.add_command(label="κ (kappa)", command=kappa)
    mb.menu.add_command(label="λ (lambda)", command=lamda)
-   mb.menu.add_command(label="Λ^3 (lambda^3)", command=lamda3)
+   mb.menu.add_command(label="Λ (lambda Mayuscula)", command=lamdaM)
    mb.menu.add_command(label="μ (mu)", command=mu)
    mb.menu.add_command(label="ν (nu)", command=nu)
    mb.menu.add_command(label="ξ (xi)", command=xi)
