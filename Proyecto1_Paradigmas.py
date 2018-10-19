@@ -67,7 +67,57 @@ def getReemplazos(entrada):
     return reemplazos
 
 #Reemplaza la entrada por cada de cada regla
-def markov(text, reemplazos):
+def markovStepped(text, reemplazos):
+    writeOnText("Entrada: " + text + "\n\n", textBot)
+    symbols = reemplazos [len(reemplazos) - 3]
+    var = reemplazos [len(reemplazos) - 2]
+    markers = reemplazos [len(reemplazos) - 1]
+    if checkSymbols(text, symbols, markers) == 1:
+        while True:
+            i = 0
+            while i < len(reemplazos) - 3:
+                label = reemplazos[i][0]
+                patron = reemplazos[i][1]
+                remp = reemplazos[i][2]
+                term = reemplazos[i][3]
+                lbl = reemplazos[i][4][1:]
+                lbl = lbl[:len(lbl) - 1]
+                i += 1
+                if lbl == "":
+                    if patron in text:
+                        text = text.replace(patron, remp, 1)
+                        writeOnText("\t->" + text, textBot)
+                        writeOnText("\t\t\t(Aplicando " + label[1:] + patron + "->" + remp + lbl + ")", textBot)
+                        writeOnText("\n", textBot)
+                        if term:
+                            return text
+                        break
+                else:
+                    for x in range (0, (len(reemplazos)) - 3):
+                        if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl:
+                            label = reemplazos[x][0][:len(reemplazos[x][0]) - 1]
+                            patron = reemplazos[x][1]
+                            remp = reemplazos[x][2]
+                            term = reemplazos[x][3]
+                            lbl = reemplazos[x][4][1:]
+                            lbl = lbl[:len(lbl) - 1]
+                            i = x
+                            if patron in text:
+                                text = text.replace(patron, remp, 1)
+                                writeOnText("\t->" + text, textBot)
+                                writeOnText("\t\t\t(Aplicando " + label[1:] + ": " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                                writeOnText("\n", textBot)
+                                i += 1
+                                if term:
+                                    return text
+                                break
+            else:
+                writeOnText("\nSalida: " + text, textBot)
+                return text
+    else:
+        writeOnText("\n\nNo coincide el alfabeto!!".upper(), textBot)
+
+def markovDirecto(text, reemplazos):
     writeOnText("Entrada: " + text + "\n", textBot)
     symbols = reemplazos [len(reemplazos) - 3]
     var = reemplazos [len(reemplazos) - 2]
@@ -86,9 +136,6 @@ def markov(text, reemplazos):
                 if lbl == "":
                     if patron in text:
                         text = text.replace(patron, remp, 1)
-                        writeOnText(text + "\t\t\t\t", textBot)
-                        writeOnText("(Aplicando " + label[1:] + patron + "->" + remp + lbl + ")", textBot)
-                        writeOnText("\n", textBot)
                         if term:
                             return text
                         break
@@ -104,9 +151,6 @@ def markov(text, reemplazos):
                             i = x
                             if patron in text:
                                 text = text.replace(patron, remp, 1)
-                                writeOnText(text + "\t\t\t\t", textBot)
-                                writeOnText("(Aplicando " + label[1:] + ": " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
-                                writeOnText("\n", textBot)
                                 i += 1
                                 if term:
                                     return text
@@ -115,7 +159,7 @@ def markov(text, reemplazos):
                 writeOnText("Salida: " + text, textBot)
                 return text
     else:
-        writeOnText("\n\nNo coincide el alfabeto".upper(), textTop)
+        writeOnText("\n\nNo coincide el alfabeto!!".upper(), textBot)
 
 def checkSymbols(text, symbols, markers):
     result = 1
@@ -152,7 +196,7 @@ def sepPatron(remp):
     r = remp[:i]
     return r
 
-def exeMarkov():
+def exeMarkovS():
     global algoritmoMarkov
     algoritmoMarkov = retrieveInput(textTop)
     entrada = retrieveInput(textBot)
@@ -160,7 +204,21 @@ def exeMarkov():
     textBot.update()
     if entrada != "":
         if algoritmoMarkov != "":
-            markov(entrada, getReemplazos(algoritmoMarkov))
+            markovStepped(entrada, getReemplazos(algoritmoMarkov))
+        else:
+            textTop.insert(END, "NO SE HA INTRODUCIDO UN ALGORITMO!")
+    else:
+        textBot.insert(END, "NO SE HA INTRODUCIDO UNA HILERA DE ENTRADA!!")
+
+def exeMarkovD():
+    global algoritmoMarkov
+    algoritmoMarkov = retrieveInput(textTop)
+    entrada = retrieveInput(textBot)
+    textBot.delete('1.0', END)
+    textBot.update()
+    if entrada != "":
+        if algoritmoMarkov != "":
+            markovDirecto(entrada, getReemplazos(algoritmoMarkov))
         else:
             textTop.insert(END, "NO SE HA INTRODUCIDO UN ALGORITMO!")
     else:
@@ -335,7 +393,8 @@ def menu(root):
 
     #submenu depurar
     runmenu = Menu(menubar, tearoff=0)
-    runmenu.add_command(label="Ejecutar", command=exeMarkov)
+    runmenu.add_command(label="Ejecutar paso a paso", command=exeMarkovS)
+    runmenu.add_command(label="Ejecutar directo", command=exeMarkovD)
     menubar.add_cascade(label="Depurar", menu=runmenu)
 
     #submenu ayuda
