@@ -269,7 +269,7 @@ def readXML(path):
 
 #Leer archivos txt y mostrarlos en pantalla
 def readTXT(path):
-    file = open(path, "r")
+    file = open(path, "r", encoding='utf8')
     textTop.delete('1.0', END)
     textTop.update()
     for line in file:
@@ -286,7 +286,6 @@ def writeXML(path):
     symbols = ET.SubElement(markov, 'symbols')
     markers = ET.SubElement(markov, 'markers')
     vars1 = ET.SubElement(markov, 'vars')
-    
     while i < len(text):
         if i < len(text) and text[i] == "%":
             x = i
