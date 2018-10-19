@@ -3,9 +3,9 @@
         <comment>% This rules file is extracted from Wikipedia:</comment>
 		<comment>% http://en.wikipedia.org/wiki/Markov_Algorithm</comment>
     </comments>
-	<symbols></symbols>
-	<markers>#markers ABST</markers>
-	<vars></vars>
+	<markers>
+		<mark>#markers ABST</mark>
+	</markers>
 	<rules>
 		<rule>_P1:A -> apple(_P2)</rule>
 		<rule>_P2:B -> bag(_P3)</rule>
