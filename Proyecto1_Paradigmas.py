@@ -7,6 +7,7 @@
 #interfaz
 from tkinter import *
 from tkinter import filedialog
+from tkinter import ttk
 import xml.etree.ElementTree as ET 
 import re
 #===============================================================Seccion de metodos=========================================================================
@@ -87,7 +88,6 @@ def markovStepped(text, reemplazos):
                 term = reemplazos[i][3]
                 lbl = reemplazos[i][4][1:]
                 lbl = lbl[:len(lbl) - 1]
-                i += 1
                 if lbl == "":
                     if patron in text:
                         text = text.replace(patron, remp, 1)
@@ -99,6 +99,14 @@ def markovStepped(text, reemplazos):
                         break
                 else:
                     for x in range (0, (len(reemplazos)) - 3):
+                        if patron in text:
+                            text = text.replace(patron, remp, 1)
+                            writeOnText("\t->" + text, textBot)
+                            writeOnText("\t\t\t(Aplicando " + label[1:] + " " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                            writeOnText("\n", textBot)
+                            if term:
+                                return text
+                            break
                         if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl:
                             label = reemplazos[x][0][:len(reemplazos[x][0]) - 1]
                             patron = reemplazos[x][1]
@@ -110,17 +118,18 @@ def markovStepped(text, reemplazos):
                             if patron in text:
                                 text = text.replace(patron, remp, 1)
                                 writeOnText("\t->" + text, textBot)
-                                writeOnText("\t\t\t(Aplicando " + label[1:] + ": " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                                writeOnText("\t\t\t(Aplicando " + label[1:] + " " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
                                 writeOnText("\n", textBot)
-                                i += 1
                                 if term:
                                     return text
                                 break
+                i += 1
             else:
-                writeOnText("\nSalida: " + text, textBot)
+                writeOnText("\nSalida: " + text + "\n", textBot)
                 return text
     else:
-        writeOnText("\n\nNo coincide el alfabeto!!".upper(), textBot)
+        popup("No coincide el alfabeto!!".upper())
+        #writeOnText("\n\nNo coincide el alfabeto!!".upper(), textBot)
 
 def markovDirecto(text, reemplazos):
     writeOnText("Entrada: " + text + "\n", textBot)
@@ -146,6 +155,14 @@ def markovDirecto(text, reemplazos):
                         break
                 else:
                     for x in range (0, (len(reemplazos)) - 3):
+                        if patron in text:
+                            text = text.replace(patron, remp, 1)
+                            writeOnText("\t->" + text, textBot)
+                            writeOnText("\t\t\t(Aplicando " + label[1:] + " " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                            writeOnText("\n", textBot)
+                            if term:
+                                return text
+                            break
                         if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl:
                             label = reemplazos[x][0][:len(reemplazos[x][0]) - 1]
                             patron = reemplazos[x][1]
@@ -161,10 +178,10 @@ def markovDirecto(text, reemplazos):
                                     return text
                                 break
             else:
-                writeOnText("Salida: " + text, textBot)
+                writeOnText("Salida: " + text + "\n", textBot)
                 return text
     else:
-        writeOnText("\n\nNo coincide el alfabeto!!".upper(), textBot)
+        popup("No coincide el alfabeto!!".upper())
 
 def checkSymbols(text, symbols, markers):
     result = 1
@@ -173,7 +190,7 @@ def checkSymbols(text, symbols, markers):
             result = 1
         elif x.lower() in symbols:
             result = 1
-        elif x != " " and x != ".":
+        elif x != " " and x != "." and x != "\n":
             result = 0
             break
     return result
@@ -211,9 +228,9 @@ def exeMarkovS():
         if algoritmoMarkov != "":
             markovStepped(entrada, getReemplazos(algoritmoMarkov))
         else:
-            textTop.insert(END, "NO SE HA INTRODUCIDO UN ALGORITMO!")
+            popup("NO SE HA INTRODUCIDO UN ALGORITMO!")
     else:
-        textBot.insert(END, "NO SE HA INTRODUCIDO UNA HILERA DE ENTRADA!!")
+        popup("NO SE HA INTRODUCIDO UNA HILERA DE ENTRADA!!")
 
 def exeMarkovD():
     global algoritmoMarkov
@@ -225,9 +242,9 @@ def exeMarkovD():
         if algoritmoMarkov != "":
             markovDirecto(entrada, getReemplazos(algoritmoMarkov))
         else:
-            textTop.insert(END, "NO SE HA INTRODUCIDO UN ALGORITMO!")
+            popup("NO SE HA INTRODUCIDO UN ALGORITMO!")
     else:
-        textBot.insert(END, "NO SE HA INTRODUCIDO UNA HILERA DE ENTRADA!!")
+        popup("NO SE HA INTRODUCIDO UNA HILERA DE ENTRADA!!")
     
 
 #Funcion para mostrar datos en el TextArea
@@ -243,22 +260,9 @@ def retrieveInput(text):
 def readXML(path):
     tree = ET.parse(path)  
     root = tree.getroot()
-    # atributos de un item
-    #print('Item #2 attribute:')  
-    #print(root[0][1].attrib)
-    # atributos de toddos los items
-    #print('\nAll attributes:')  
     for elem in root:  
         for subelem in elem:
-            print(subelem.attrib)
-    # dato de un item especifico
-    #print('\nItem #2 data:')  
-    #print(root[0][1].text)
-    # datos de todos los items
-    #print('\nAll item data:')  
-    for elem in root:  
-        for subelem in elem:
-            writeOnText(subelem.text, textTop)
+            writeOnText(subelem.text + "\n", textTop)
         writeOnText("\n", textTop)
 
 #Leer archivos txt y mostrarlos en pantalla
@@ -270,18 +274,54 @@ def readTXT(path):
         writeOnText(line, textTop) 
 
 #Crear y guarddar archivos xml (ver e implementar el formato del los xml)
-def writeXML(path):
-    data = ET.Element('data')  
-    items = ET.SubElement(data, 'items')  
-    item1 = ET.SubElement(items, 'item')  
-    item2 = ET.SubElement(items, 'item')  
-    item1.set('name','item1')  
-    item2.set('name','item2')  
-    item1.text = 'item1abc'  
-    item2.text = 'item2abc'
+def writeXML(path):    
+    markov = ET.Element('markov')
+    text = retrieveInput(textTop)
+    comments = ET.SubElement(markov, 'comments')
+    symbols = ET.SubElement(markov, 'symbols')
+    markers = ET.SubElement(markov, 'markers')
+    vars1 = ET.SubElement(markov, 'vars')
+    rules = ET.SubElement(markov, 'rules')
+    i = 0
+    strg = ""
+    
+    while i < len(text):
+        if i < len(text) and text[i] == "%":
+            x = i
+            while i < len(text) and text[i] != "\n":
+                i += 1
+            strg = text[x:i]
+            comment = ET.SubElement(comments, 'comment')
+            comment.text = strg
+        elif i < len(text) and text[i] == "#" and text[i + 1] == "s":
+            x = i
+            while i < len(text) and text[i] != "\n":
+                i += 1
+            strg = text[x:i]
+            symbols.text = strg
+        elif i < len(text) and text[i] == "#" and text[i + 1] == "m":
+            x = i
+            while i < len(text) and text[i] != "\n":
+                i += 1
+            strg = text[x:i]
+            markers.text = strg
+        elif i < len(text) and text[i] == "#" and text[i + 1] == "v":
+            x = i
+            while i < len(text) and text[i] != "\n":
+                i += 1
+            strg = text[x:i]
+            vars1.text = strg
+        else:
+            x = i
+            while i < len(text) and text[i] != "\n":
+                i += 1
+            strg = text[x:i]
+            rule = ET.SubElement(rules, 'rule')
+            rule.text = strg
+        i += 1
     # crea un nuevo archivo XML con los resultados 
     myfile = open(path, "wb")  
-    myfile.write(ET.tostring(data))
+    myfile.write(ET.tostring(markov))
 
 #Crear y guardar archivos txt
 def writeTXT(path):
@@ -327,7 +367,48 @@ def modificarArchivo():
             writeTXT(pathFile)
     else:
         guardarArchivo()
+
+def hilerasPruebaTXT():
+    path = filedialog.askopenfilename(initialdir = "/",title = "Abrir archivo de prueba", filetypes = (("Text file","*.txt"), (("Text files","*.txt"))))
+    realizaPruebasHileras(path)
     
+def realizaPruebasHileras(path):
+    file = open(path, "r")
+    textBot.delete('1.0', END)
+    textBot.update()
+    algoritmoMarkov = retrieveInput(textTop)
+    if algoritmoMarkov != "":
+        for line in file:
+            markovDirecto(line, getReemplazos(algoritmoMarkov))
+    else:
+        popup( "NO SE HA INTRODUCIDO UN ALGORITMO!")
+
+def hilerasPruebaTXTStepped():
+    path = filedialog.askopenfilename(initialdir = "/",title = "Abrir archivo de prueba", filetypes = (("Text file","*.txt"), (("Text files","*.txt"))))
+    realizaPruebasHilerasStepped(path)
+    
+def realizaPruebasHilerasStepped(path):
+    file = open(path, "r")
+    textBot.delete('1.0', END)
+    textBot.update()
+    algoritmoMarkov = retrieveInput(textTop)
+    if algoritmoMarkov != "":
+        for line in file:
+            markovStepped(line, getReemplazos(algoritmoMarkov))
+    else:
+        popup("NO SE HA INTRODUCIDO UN ALGORITMO!")
+
+def popup(msg):
+    LARGE_FONT= ("Verdana", 12)
+    NORM_FONT = ("Helvetica", 10)
+    SMALL_FONT = ("Helvetica", 8)
+    popup = Tk()
+    popup.wm_title("!")
+    label = ttk.Label(popup, text=msg, font=NORM_FONT)
+    label.pack(side="top", fill="x", pady=10)
+    B1 = ttk.Button(popup, text="Okay", command = popup.destroy)
+    B1.pack()
+    popup.mainloop()
 
 #Mostrar el textArea en la pantalla
 def textArea(root):
@@ -400,6 +481,8 @@ def menu(root):
     runmenu = Menu(menubar, tearoff=0)
     runmenu.add_command(label="Ejecutar paso a paso", command=exeMarkovS)
     runmenu.add_command(label="Ejecutar directo", command=exeMarkovD)
+    runmenu.add_command(label="Ejecutar con archivo de hileras de prueba (Directo)", command=hilerasPruebaTXT)
+    runmenu.add_command(label="Ejecutar con archivo de hileras de prueba (Paso a paso)", command=hilerasPruebaTXTStepped)
     menubar.add_cascade(label="Depurar", menu=runmenu)
 
     #submenu ayuda
