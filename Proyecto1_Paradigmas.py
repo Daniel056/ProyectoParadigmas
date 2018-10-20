@@ -30,160 +30,131 @@ regularExpression = r"""(?mx)
 
 #Devuelve cada regla del algoritmo ingresado
 def getReemplazos(entrada):
-    reemplazos = []
-    s = 0
-    v = 0
-    m = 0
-    for reobj in re.finditer(regularExpression, entrada):
+    
+    reemplazos = []     #Guardar los parametros del algoritmo de markov
+    s = 0               #Para saber si ya se guardo el alfabeto del algoritmo
+    v = 0               #Para saber si ya se guardaron las variables del algoritmo
+    m = 0               #Para saber si ya se guardaron los markers del algoritmo
+    for reobj in re.finditer(regularExpression, entrada): #Devuelve un iterador conteniendo los parametros y lo guarda en reobj
         if s == 0:
-            if bool(reobj.group('symbols')):
-                symbols = reobj.group('symbols')[9:]
-                if (symbols != ""):
-                    s += 1
+            if bool(reobj.group('symbols')): #Si el alfabeto esta en reobj
+                symbols = reobj.group('symbols')[9:] #asigna el alfabeto desde la posicion 9 del string
+                if (symbols != ""): 
+                    s += 1 #Para saber que ya se guardo el alfabeto
         if v == 0:
-            if bool(reobj.group('vars')):
-                var = reobj.group('vars')[6:]
+            if bool(reobj.group('vars')):    #Si las variables estan en reobj
+                var = reobj.group('vars')[6:] #asigna variables desde la posicion 6 del string
                 if (var != ""):
-                    v += 1
+                    v += 1  #Para saber que ya se guardo las variables
         if m == 0:
-            if bool(reobj.group('markers')):
-                markers = reobj.group('markers')[9:]
+            if bool(reobj.group('markers')): #Si los markers estan en reobj
+                markers = reobj.group('markers')[9:] #asigna markers desde la posicion 9 del string
                 if (markers != ""):
-                    m += 1
-        if reobj.group('rule'):
-            if (reobj.group('label')):
-                remp = sepPatron(reobj.group('remp'))
-                lbl = getLbl(reobj.group('remp'))
-                if "Λ" in remp:
-                    remp = remp.replace("Λ", "", 1)
+                    m += 1 #Para saber que ya se guardo los markers
+        if reobj.group('rule'): #Si reobj contiene reglas de sustitucion
+            remp = sepPatron(reobj.group('remp')) #Asigna el remplazo a remp
+            if "Λ" in remp:
+                remp = remp.replace("Λ", "", 1) #Sustituye Λ por la hilera vacia
+            if (reobj.group('label')): #Si reobj contiene nombre ->P1:
+                lbl = getLbl(reobj.group('remp')) #Asigna la etiqueta a lbl
                 reemplazos.append((reobj.group('label'), reobj.group('patron'), remp, bool(reobj.group('term')), lbl))
+                #Asigna vector con reglas al vector reemplazos
             else:
-                remp = reobj.group('remp')
-                if "Λ" in remp:
-                    remp = remp.replace("Λ", "", 1)
-                reemplazos.append(("", reobj.group('patron'), reobj.group('remp'), bool(reobj.group('term')), ""))
-    if (s == 0):
-        symbols = "abcdefghijklmnopqrstuvwxyz0123456789"
-    if (v == 0):
-        var = "wxyz"
-    if (m == 0):
-        markers = "αβγδ"
-    reemplazos.append(symbols)
-    reemplazos.append(var)
-    reemplazos.append(markers)
-    return reemplazos
+                reemplazos.append(("", reobj.group('patron'), remp, bool(reobj.group('term')), ""))
+                #Asigna vector con reglas al vector reemplazos
+    if (s == 0): #El algoritmo no especificaba el alfabeto
+        symbols = "abcdefghijklmnopqrstuvwxyz0123456789" #Alfabeto por defecto
+    if (v == 0):  #El algoritmo no especificaba variables
+        var = "wxyz" #Variables por defecto
+    if (m == 0):  #El algoritmo no especificaba merkers
+        markers = "αβγδ" #Markers por defecto
+    reemplazos.append(symbols) #
+    reemplazos.append(var) #Asigna el alfabeto, variables y markers al vector reemplazos
+    reemplazos.append(markers) #
+    return reemplazos #retorna el vector con todos los parametros del algoritmo
 
 #Reemplaza la entrada por cada de cada regla
 def markovStepped(text, reemplazos):
     writeOnText("Entrada: " + text + "\n\n", textBot)
-    symbols = reemplazos [len(reemplazos) - 3]
-    var = reemplazos [len(reemplazos) - 2]
-    markers = reemplazos [len(reemplazos) - 1]
+    symbols = reemplazos [len(reemplazos) - 3] #Guarda el alfabeto del vector reemplazos en symbols
+    var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
+    markers = reemplazos [len(reemplazos) - 1] #Guarda markers del vector reemplazos en symbols
     if checkSymbols(text, symbols, markers) == 1:
-        while True:
-            i = 0
+        while True: #El algoritmo se ejecuta hasta que no se puedan aplicar reglas, o haya una regla terminal
+            i = 0 #contador para el vector reemplazos
             while i < len(reemplazos) - 3:
-                label = reemplazos[i][0]
-                patron = reemplazos[i][1]
-                remp = reemplazos[i][2]
-                term = reemplazos[i][3]
-                lbl = reemplazos[i][4][1:]
-                lbl = lbl[:len(lbl) - 1]
-                if lbl == "":
-                    if patron in text:
-                        text = text.replace(patron, remp, 1)
-                        writeOnText("\t->" + text, textBot)
+                label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
+                patron = reemplazos[i][1] #Asigna el patron de la regla
+                remp = reemplazos[i][2] #Asigna el remplazo de la regla
+                term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
+                lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
+                lbl = lbl[:len(lbl) - 1] #Elimina el parentesis cerrado ) de la etiqueta
+                if patron in text: #Si el texto contiene el patron de reemplazo
+                    text = text.replace(patron, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                    writeOnText("\t->" + text, textBot)
+                    if lbl == "": #Si la regla contiene etiqueta (para formato)
                         writeOnText("\t\t\t(Aplicando " + label[1:] + patron + "->" + remp + lbl + ")", textBot)
-                        writeOnText("\n", textBot)
-                        if term:
-                            return text
-                        break
-                else:
-                    for x in range (0, (len(reemplazos)) - 3):
-                        if patron in text:
-                            text = text.replace(patron, remp, 1)
-                            writeOnText("\t->" + text, textBot)
-                            writeOnText("\t\t\t(Aplicando " + label[1:] + " " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
-                            writeOnText("\n", textBot)
-                            if term:
-                                return text
-                            break
-                        if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl:
-                            label = reemplazos[x][0][:len(reemplazos[x][0]) - 1]
-                            patron = reemplazos[x][1]
-                            remp = reemplazos[x][2]
-                            term = reemplazos[x][3]
-                            lbl = reemplazos[x][4][1:]
-                            lbl = lbl[:len(lbl) - 1]
-                            i = x
-                            if patron in text:
-                                text = text.replace(patron, remp, 1)
-                                writeOnText("\t->" + text, textBot)
-                                writeOnText("\t\t\t(Aplicando " + label[1:] + " " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
-                                writeOnText("\n", textBot)
-                                if term:
-                                    return text
+                    else:
+                        writeOnText("\t\t\t(Aplicando " + label[1:] + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                    writeOnText("\n", textBot)
+                    if term: #Si la regla es terminal
+                        writeOnText("Se ha aplicado una regla terminal\n", textBot)
+                        writeOnText("\nSalida: " + text + "\n", textBot)
+                        return text #Retorna, y sale del metodo
+                    if lbl == "": #Si la regla contiene etiqueta
+                        break #Sale del 2 while
+                    else:
+                        x = 0 #Contador para el vector reemplazos
+                        while x < (len(reemplazos) - 3):
+                            if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl: #Busca la regla que el nombre sea igual a lbl
+                                i = x - 1 #Asigna a i la posicion de la regla encontrada
                                 break
+                            x += 1 
                 i += 1
-            else:
+            else: #No se pueden aplicar mas reglas
+                writeOnText("No se pueden aplicar mas reglas\n", textBot)
                 writeOnText("\nSalida: " + text + "\n", textBot)
                 return text
     else:
         popup("No coincide el alfabeto!!".upper())
-        #writeOnText("\n\nNo coincide el alfabeto!!".upper(), textBot)
 
 def markovDirecto(text, reemplazos):
     writeOnText("Entrada: " + text + "\n", textBot)
-    symbols = reemplazos [len(reemplazos) - 3]
-    var = reemplazos [len(reemplazos) - 2]
-    markers = reemplazos [len(reemplazos) - 1]
+    symbols = reemplazos [len(reemplazos) - 3] #Guarda el alfabeto del vector reemplazos en symbols
+    var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
+    markers = reemplazos [len(reemplazos) - 1] #Guarda markers del vector reemplazos en symbols
     if checkSymbols(text, symbols, markers) == 1:
-        while True:
-            i = 0
+        while True: #El algoritmo se ejecuta hasta que no se puedan aplicar reglas, o haya una regla terminal
+            i = 0 #contador para el vector reemplazos
             while i < len(reemplazos) - 3:
-                label = reemplazos[i][0]
-                patron = reemplazos[i][1]
-                remp = reemplazos[i][2]
-                term = reemplazos[i][3]
-                lbl = reemplazos[i][4][1:]
-                lbl = lbl[:len(lbl) - 1]
-                i += 1
-                if lbl == "":
-                    if patron in text:
-                        text = text.replace(patron, remp, 1)
-                        if term:
-                            return text
-                        break
-                else:
-                    for x in range (0, (len(reemplazos)) - 3):
-                        if patron in text:
-                            text = text.replace(patron, remp, 1)
-                            writeOnText("\t->" + text, textBot)
-                            writeOnText("\t\t\t(Aplicando " + label[1:] + " " + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
-                            writeOnText("\n", textBot)
-                            if term:
-                                return text
-                            break
-                        if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl:
-                            label = reemplazos[x][0][:len(reemplazos[x][0]) - 1]
-                            patron = reemplazos[x][1]
-                            remp = reemplazos[x][2]
-                            term = reemplazos[x][3]
-                            lbl = reemplazos[x][4][1:]
-                            lbl = lbl[:len(lbl) - 1]
-                            i = x
-                            if patron in text:
-                                text = text.replace(patron, remp, 1)
-                                i += 1
-                                if term:
-                                    return text
+                label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
+                patron = reemplazos[i][1] #Asigna el patron de la regla
+                remp = reemplazos[i][2] #Asigna el remplazo de la regla
+                term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
+                lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
+                lbl = lbl[:len(lbl) - 1] #Elimina el parentesis cerrado ) de la etiqueta
+                if patron in text: #Si el texto contiene el patron de reemplazo
+                    text = text.replace(patron, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                    if term: #Si la regla es terminal
+                        writeOnText("\nSalida: " + text + "\n", textBot)
+                        return text #Retorna, y sale del metodo
+                    if lbl == "": #Si la regla contiene etiqueta
+                        break #Sale del 2 while
+                    else:
+                        x = 0 #Contador para el vector reemplazos
+                        while x < (len(reemplazos) - 3):
+                            if reemplazos[x][0][:len(reemplazos[x][0]) - 1] == lbl: #Busca la regla que el nombre sea igual a lbl
+                                i = x - 1 #Asigna a i la posicion de la regla encontrada
                                 break
-            else:
-                writeOnText("Salida: " + text + "\n", textBot)
+                            x += 1 
+                i += 1
+            else: #No se pueden aplicar mas reglas
+                writeOnText("\nSalida: " + text + "\n", textBot)
                 return text
     else:
         popup("No coincide el alfabeto!!".upper())
 
+#Revisa si la entrada no contiene elementos del alfabeto
 def checkSymbols(text, symbols, markers):
     result = 1
     for x in text:
@@ -196,6 +167,7 @@ def checkSymbols(text, symbols, markers):
             break
     return result
 
+#Separa la etiqueta de la regla de reemplazo (remp) y la retorna
 def getLbl(remp):
     i = 0
     r = ""
@@ -208,6 +180,7 @@ def getLbl(remp):
         r = remp[i:]
     return r
 
+#Separa el patron de la etiqueta y lo retorna
 def sepPatron(remp):
     i = 0
     r = ""
@@ -219,6 +192,7 @@ def sepPatron(remp):
     r = remp[:i]
     return r
 
+#Ejecuta el algoritmo Paso por Paso
 def exeMarkovS():
     global algoritmoMarkov
     algoritmoMarkov = retrieveInput(textTop)
@@ -233,6 +207,7 @@ def exeMarkovS():
     else:
         popup("NO SE HA INTRODUCIDO UNA HILERA DE ENTRADA!!")
 
+#Ejecuta el algoritmo directo
 def exeMarkovD():
     global algoritmoMarkov
     algoritmoMarkov = retrieveInput(textTop)
@@ -373,10 +348,12 @@ def modificarArchivo():
     else:
         guardarArchivo()
 
+#Abre explorador de archivos para elegir el archivo con hileras de prueba (Directo)
 def hilerasPruebaTXT():
     path = filedialog.askopenfilename(initialdir = "/",title = "Abrir archivo de prueba", filetypes = (("Text file","*.txt"), (("Text files","*.txt"))))
     realizaPruebasHileras(path)
-    
+
+#Realiza la prueba sobre las hileras del texto abierto (Directo)
 def realizaPruebasHileras(path):
     file = open(path, "r")
     textBot.delete('1.0', END)
@@ -388,10 +365,12 @@ def realizaPruebasHileras(path):
     else:
         popup( "NO SE HA INTRODUCIDO UN ALGORITMO!")
 
+#Abre explorador de archivos para elegir el archivo con hileras de prueba (Paso por paso)
 def hilerasPruebaTXTStepped():
     path = filedialog.askopenfilename(initialdir = "/",title = "Abrir archivo de prueba", filetypes = (("Text file","*.txt"), (("Text files","*.txt"))))
     realizaPruebasHilerasStepped(path)
-    
+
+#Realiza la prueba sobre las hileras del texto abierto (Paso por paso)
 def realizaPruebasHilerasStepped(path):
     file = open(path, "r")
     textBot.delete('1.0', END)
@@ -403,6 +382,7 @@ def realizaPruebasHilerasStepped(path):
     else:
         popup("NO SE HA INTRODUCIDO UN ALGORITMO!")
 
+#Muestra un pop up mostrando el mensaje recibido
 def popup(msg):
     LARGE_FONT= ("Verdana", 12)
     NORM_FONT = ("Helvetica", 10)
