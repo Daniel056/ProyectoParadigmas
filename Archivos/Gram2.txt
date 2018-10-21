@@ -1,7 +1,7 @@
 % Slightly modified from the rules on Wikipedia
 A -> apple
 B -> bag
-S -> .shop
+S -> shop
 T -> the
 the shop -> my brother
 

@@ -1,12 +1,12 @@
 % BNF Syntax testing rules
 A -> apple
-WWWW -> with
 Bgage -> ->.*
 B -> bag
 ->.* -> money
-W -> WW
-S -> .shop
+W -> WWWW
+S -> shop
 T -> the
+WWWW -> with
 the shop -> my brother
 
 %La sigte linea es la que se pega en el text de abajo sin "%"
