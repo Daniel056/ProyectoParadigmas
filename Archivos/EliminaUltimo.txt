@@ -1,0 +1,10 @@
+% Algoritmo 2.
+% Este algoritmo elimina el último carácter de la hilera de entrada.
+% La hilera de entrada debe contener al menos un carácter.  
+#symbols abcdefghijklmnopqrstuvwxyz0123456789
+#vars x
+#markers β  
+_P1:βx -> xβ (_P1)
+_P2:xβ -> Λ.
+_P3:x -> βx (_P1)
+%Pruben con cualquier hilera
