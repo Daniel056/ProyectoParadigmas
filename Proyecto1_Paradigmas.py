@@ -211,7 +211,7 @@ def getMarkerIndex(entrada, marker):
 def eliminaEspacios(reemp):
     i = 0
     while i < len(reemp):
-        if reemp[i] == " :
+        if reemp[i] == "" :
             break
         i += 1
     return reemp[:i]
