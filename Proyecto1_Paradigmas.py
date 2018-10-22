@@ -109,9 +109,9 @@ def sustitucionMarkovStepped(text, reemplazos):
             rempVar = checkvars(remp, var) #Guarda la variable del reemplazo (si hay)
             if patronVar != "": #Si hay variable en el patron
                 if z < len(text):
-                    patronVar = patron.replace(patronVar, text[z], 1) #Reemplaza el patron con el caracter de la entrada en la pos z
+                    patronVar = patron.replace(patronVar, text[z]) #Reemplaza el patron con el caracter de la entrada en la pos z
                     if rempVar != "": #Si hay variable en el reemplazo
-                        rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
+                        rempVar = remp.replace(rempVar, text[z]) #Reemplaza el remp con el caracter de la entrada en la pos z
                         rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
                         if patronVar in text: #Si el texto contiene el patron de reemplazo
                             text = text.replace(patronVar, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
@@ -155,7 +155,7 @@ def sustitucionMarkovStepped(text, reemplazos):
                 else:
                     return text
             elif rempVar != "": #No hay variable en el patron, si hay variable en el reemplazo 
-                rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
+                rempVar = remp.replace(rempVar, text[z]) #Reemplaza el remp con el caracter de la entrada en la pos z
                 rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
                 if patron in text: #Si el texto contiene el patron de reemplazo
                     text = text.replace(patron, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
