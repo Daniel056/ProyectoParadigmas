@@ -53,25 +53,26 @@ def getReemplazos(entrada):
                     m += 1 #Para saber que ya se guardo los markers
         if reobj.group('rule'): #Si reobj contiene reglas de sustitucion
             remp = sepPatron(reobj.group('remp')) #Asigna el remplazo a remp
+            pat = reobj.group('patron')
+            if "Λ" in pat:
+                pat = pat.replace("Λ", "", 1) #Sustituye Λ por la hilera vacia
             if "Λ" in remp:
                 remp = remp.replace("Λ", "", 1) #Sustituye Λ por la hilera vacia
             if (reobj.group('label')): #Si reobj contiene nombre ->P1:
                 lbl = getLbl(reobj.group('remp')) #Asigna la etiqueta a lbl
                 if "." in remp:
-                    reemplazos.append((reobj.group('label'), reobj.group('patron'), remp, True, lbl))
+                    reemplazos.append((reobj.group('label'), pat, remp, True, lbl))
                     #Asigna vector con reglas al vector reemplazos
                 else:
-                    reemplazos.append((reobj.group('label'), reobj.group('patron'), remp, bool(reobj.group('term')), lbl))
+                    reemplazos.append((reobj.group('label'), pat, remp, bool(reobj.group('term')), lbl))
             else:
                 if "." in remp:
-                    reemplazos.append(("", reobj.group('patron'), remp, True, ""))
+                    reemplazos.append(("", pat, remp, True, ""))
                     #Asigna vector con reglas al vector reemplazos
                 else:
-                    reemplazos.append(("", reobj.group('patron'), remp, bool(reobj.group('term')), ""))
+                    reemplazos.append(("", pat, remp, bool(reobj.group('term')), ""))
     if (s == 0): #El algoritmo no especificaba el alfabeto
         symbols = "abcdefghijklmnopqrstuvwxyz0123456789" #Alfabeto por defecto
-    #if (v == 0):  #El algoritmo no especificaba variables
-        #var = "wxyz" #Variables por defecto
     if (m == 0):  #El algoritmo no especificaba merkers
         markers = "αβγδ" #Markers por defecto
     reemplazos.append(symbols) #
@@ -79,112 +80,121 @@ def getReemplazos(entrada):
     reemplazos.append(markers) #
     return reemplazos #retorna el vector con todos los parametros del algoritmo
 
-def sustitucionMarkovStepped(text, reemplazos, i, z):
-    global textFinal
-    if i < (len(reemplazos) - 3):
-        if getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) == len(text) - 1:
+def sustitucionMarkovStepped(text, reemplazos):
+    w = 0
+    while w < len(reemplazos) + 1:
+        i = 0
+        z = 0
+        while i < len(reemplazos) - 3:
+            if checkvars(reemplazos[i][1], reemplazos [len(reemplazos) - 2])!= "" and getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) == len(text) - 1:   
             #el marcador esta al final de la hilera de entrada
-            i += 1 #Se pasa a la siguiente regla
-            z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
-            z = z - 1 #Se pasa a la izq del marcador
-        else:
-            z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
-            z = z + 1 #Se pasa a la derecha de marcador
-        label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
-        patron = reemplazos[i][1] #Asigna el patron de la regla
-        remp = reemplazos[i][2] #Asigna el remplazo de la regla
-        term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
-        lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
-        lbl = lbl[:len(lbl) - 1] #Elimina el parentesis cerrado ) de la etiqueta
-        var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
-        patronVar = checkvars(patron, var) #Guarda la variable del patron (si hay)
-        varT = getMarker(patron, reemplazos [len(reemplazos) - 1]) #Guarda el marcador del patron (si hay)
-        aux = patronVar #Guarda la variable del patron (si hay)
-        rempVar = checkvars(remp, var) #Guarda la variable del reemplazo (si hay)
-        if patronVar != "": #Si hay variable en el patron
-            if z < len(text):
-                patronVar = patron.replace(patronVar, text[z], 1) #Reemplaza el patron con el caracter de la entrada en la pos z
-                if rempVar != "": #Si hay variable en el reemplazo
-                    rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
-                    rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
-                    if patronVar in text: #Si el texto contiene el patron de reemplazo
-                        text = text.replace(patronVar, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                        writeOnText("\t->" + text, textBot)
-                        if lbl == "": #Si la regla contiene etiqueta (para formato)
-                            writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + rempVar + lbl + ")", textBot)
-                        else:
-                            writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + rempVar + " " + "(" + lbl[1:] + "))", textBot)
-                        writeOnText("\n", textBot)
-                        if term: #Si la regla es terminal
-                            textFinal = text #Asigna el resultado a la variable global textFinal
-                            return text #Retorna, y sale del metodo
-                        if lbl == "": #Si la regla contiene etiqueta
-                            sustitucionMarkovStepped(text, reemplazos, i + 1, z + 1)#Llamado recursivo con la regla en la posicion i + 1
-                        else:
-                            sustitucionMarkovStepped(text, reemplazos, aumentador(reemplazos, lbl), z + 1)#Llamado recursivo con la posicion de la etiqueta 
-                    else:#El patron no esta en la hilera de entrada
-                        sustitucionMarkovStepped(text, reemplazos, i + 1, z)#Llamado recursivo con la regla en la posicion i + 1
-                else: #no hay variable en el reemplazo
-                    if patronVar in text: #Si el texto contiene el patron de reemplazo
-                        text = text.replace(patronVar, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                        writeOnText("\t->" + text, textBot)
-                        if lbl == "": #Si la regla contiene etiqueta (para formato)
-                            writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + remp + lbl + ")", textBot)
-                        else:
-                            writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
-                        writeOnText("\n", textBot)
-                        if term: #Si la regla es terminal
-                            textFinal = text #Asigna el resultado a la variable global textFinal
-                            return text #Retorna, y sale del metodo
-                        if lbl == "": #Si la regla contiene etiqueta
-                            sustitucionMarkovStepped(text, reemplazos, i + 1, z + 1)#Llamado recursivo con la regla en la posicion i + 1
-                        else:
-                            sustitucionMarkovStepped(text, reemplazos, aumentador(reemplazos, lbl), z) #Llamado recursivo con la posicion de la etiqueta 
-                    else: #El patron no esta en la hilera de entrada
-                        sustitucionMarkovStepped(text, reemplazos, i + 1, z + 1)#Llamado recursivo con la regla en la posicion i + 1
-            else:
-                textFinal = text #Asigna el resultado a la variable global textFinal
-                return text
-        elif rempVar != "": #No hay variable en el patron, si hay variable en el reemplazo 
-            rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
-            rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
-            if patron in text: #Si el texto contiene el patron de reemplazo
-                text = text.replace(patron, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                writeOnText("\t->" + text, textBot)
-                if lbl == "": #Si la regla contiene etiqueta (para formato)
-                    writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + rempVar + lbl + ")", textBot)
+                i += 1 #Se pasa a la siguiente regla
+                z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
+                z = z - 1 #Se pasa a la izq del marcador
+            elif checkvars(reemplazos[i][1], reemplazos [len(reemplazos) - 2]) != "":
+                z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
+                z = z + 1 #Se pasa a la derecha de marcador
+            label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
+            patron = reemplazos[i][1] #Asigna el patron de la regla
+            if parton == "":
+                patron = text[0]
+            remp = reemplazos[i][2] #Asigna el remplazo de la regla
+            term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
+            lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
+            lbl = lbl[:len(lbl) - 1] #Elimina el parentesis cerrado ) de la etiqueta
+            var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
+            patronVar = checkvars(patron, var) #Guarda la variable del patron (si hay)
+            varT = getMarker(patron, reemplazos [len(reemplazos) - 1]) #Guarda el marcador del patron (si hay)
+            aux = patronVar #Guarda la variable del patron (si hay)
+            rempVar = checkvars(remp, var) #Guarda la variable del reemplazo (si hay)
+            if patronVar != "": #Si hay variable en el patron
+                if z < len(text):
+                    patronVar = patron.replace(patronVar, text[z], 1) #Reemplaza el patron con el caracter de la entrada en la pos z
+                    if rempVar != "": #Si hay variable en el reemplazo
+                        rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
+                        rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
+                        if patronVar in text: #Si el texto contiene el patron de reemplazo
+                            text = text.replace(patronVar, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                            writeOnText("\t->" + text, textBot)
+                            if lbl == "": #Si la regla contiene etiqueta (para formato)
+                                writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + rempVar + lbl + ")", textBot)
+                            else:
+                                writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + rempVar + " " + "(" + lbl[1:] + "))", textBot)
+                            writeOnText("\n", textBot)
+                            if term: #Si la regla es terminal
+                                return text #Retorna, y sale del metodo
+                            if lbl == "": #Si la regla contiene etiqueta
+                                z = z + 1
+                                i = i + 1
+                            else:
+                                z = z + 1
+                                i = aumentador(reemplazos, lbl)
+                        else:#El patron no esta en la hilera de entrada
+                            i = i + 1
+                            w = w + 1
+                    else: #no hay variable en el reemplazo
+                        if patronVar in text: #Si el texto contiene el patron de reemplazo
+                            text = text.replace(patronVar, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                            writeOnText("\t->" + text, textBot)
+                            if lbl == "": #Si la regla contiene etiqueta (para formato)
+                                writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + remp + lbl + ")", textBot)
+                            else:
+                                writeOnText("\t\t(Aplicando " + label[1:] + patronVar + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                            writeOnText("\n", textBot)
+                            if term: #Si la regla es terminal
+                                return text #Retorna, y sale del metodo
+                            if lbl == "": #Si la regla contiene etiqueta
+                                z = z + 1
+                                i = i + 1
+                            else:
+                                z = z + 1
+                                i = aumentador(reemplazos, lbl)
+                        else: #El patron no esta en la hilera de entrada
+                            i = i + 1
+                            w = w + 1
                 else:
-                    writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + rempVar + " " + "(" + lbl[1:] + "))", textBot)
-                writeOnText("\n", textBot)
-                if term: #Si la regla es terminal
-                    textFinal = text #Asigna el resultado a la variable global textFinal
-                    return text #Retorna, y sale del metodo
-                if lbl == "": #Si la regla contiene etiqueta
-                    sustitucionMarkovStepped(text, reemplazos, i + 1, z + 1)#Llamado recursivo con la regla en la posicion i + 1
-                else:
-                    sustitucionMarkovStepped(text, reemplazos, aumentador(reemplazos, lbl), z + 1) #Llamado recursivo con la posicion de la etiqueta 
-            else: #El patron no esta en la hilera de entrada
-                sustitucionMarkovStepped(text, reemplazos, i + 1, z)#Llamado recursivo con la regla en la posicion i + 1  
-        else: #No hay variable en el patron ni en el reemplazo
-            if patron in text: #Si la regla es terminal
-                text = text.replace(patron, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                writeOnText("\t->" + text, textBot)
-                if lbl == "": #Si la regla contiene etiqueta (para formato)
-                    writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + remp + lbl + ")", textBot)
-                else:
-                    writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
-                writeOnText("\n", textBot)
-                if term: #Si la regla es terminal
-                    textFinal = text #Asigna el resultado a la variable global textFinal
-                    return text #Retorna, y sale del metodo
-                if lbl == "": #Si la regla contiene etiqueta
-                    sustitucionMarkovStepped(text, reemplazos, i + 1, z)#Llamado recursivo con la regla en la posicion i + 1
-                else:
-                    sustitucionMarkovStepped(text, reemplazos, aumentador(reemplazos, lbl), z) #Llamado recursivo con la posicion de la etiqueta 
-            else: #El patron no esta en la hilera de entrada
-                sustitucionMarkovStepped(text, reemplazos, i + 1, z)#Llamado recursivo con la regla en la posicion i + 1  
+                    return text
+            elif rempVar != "": #No hay variable en el patron, si hay variable en el reemplazo 
+                rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
+                rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
+                if patron in text: #Si el texto contiene el patron de reemplazo
+                    text = text.replace(patron, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                    writeOnText("\t->" + text, textBot)
+                    if lbl == "": #Si la regla contiene etiqueta (para formato)
+                        writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + rempVar + lbl + ")", textBot)
+                    else:
+                        writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + rempVar + " " + "(" + lbl[1:] + "))", textBot)
+                    writeOnText("\n", textBot)
+                    if term: #Si la regla es terminal
+                        return text #Retorna, y sale del metodo
+                    if lbl == "": #Si la regla contiene etiqueta
+                        z = z + 1
+                        i = i + 1
+                    else:
+                        z = z + 1
+                        i = aumentador(reemplazos, lbl)
+                else: #El patron no esta en la hilera de entrada
+                    i = i + 1
+                    w = w + 1
+            else: #No hay variable en el patron ni en el reemplazo
+                if patron in text: #Si la regla es terminal
+                    text = text.replace(patron, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                    writeOnText("\t->" + text, textBot)
+                    if lbl == "": #Si la regla contiene etiqueta (para formato)
+                        writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + remp + lbl + ")", textBot)
+                    else:
+                        writeOnText("\t\t(Aplicando " + label[1:] + patron + "->" + remp + " " + "(" + lbl[1:] + "))", textBot)
+                    writeOnText("\n", textBot)
+                    if term: #Si la regla es terminal
+                        return text #Retorna, y sale del metodo
+                    if lbl == "": #Si la regla contiene etiqueta
+                        i = i + 1
+                    else:
+                        i = aumentador(reemplazos, lbl)
+                else: #El patron no esta en la hilera de entrada
+                    i = i + 1
+                    w = w + 1
     else:
-        textFinal = text #Asigna el resultado a la variable global textFinal
         return text
 
 #Aumenta el contador para acceder a las reglas
@@ -252,117 +262,116 @@ def getMarker(entrada, markers):
     return ""
 
 #Algoritmo de Markov directo
-def sustitucionMarkovD(text, reemplazos, i, z):
-    global textFinal
-    if i < (len(reemplazos) - 3):
-        if getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) == len(text) - 1:
-            #el marcador esta al final de la hilera de entrada
-            i += 1 #Se pasa a la siguiente regla
-            z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
-            z = z - 1 #Se pasa a la izq del marcador
-        else:
-            z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
-            z = z + 1 #Se pasa a la derecha de marcador
-        label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
-        patron = reemplazos[i][1] #Asigna el patron de la regla
-        remp = reemplazos[i][2] #Asigna el remplazo de la regla
-        term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
-        lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
-        lbl = lbl[:len(lbl) - 1] #Elimina el parentesis cerrado ) de la etiqueta
-        var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
-        patronVar = checkvars(patron, var) #Guarda la variable del patron (si hay)
-        varT = getMarker(patron, reemplazos [len(reemplazos) - 1]) #Guarda el marcador del patron (si hay)
-        aux = patronVar #Guarda la variable del patron (si hay)
-        rempVar = checkvars(remp, var) #Guarda la variable del reemplazo (si hay)
-        if patronVar != "": #Si hay variable en el patron
-            if z < len(text):
-                patronVar = patron.replace(patronVar, text[z], 1) #Reemplaza el patron con el caracter de la entrada en la pos z
-                if rempVar != "": #Si hay variable en el reemplazo
-                    rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
-                    rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
-                    if patronVar in text: #Si el texto contiene el patron de reemplazo
-                        text = text.replace(patronVar, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                        if term: #Si la regla es terminal
-                            textFinal = text #Asigna el resultado a la variable global textFinal
-                            return text #Retorna, y sale del metodo
-                        if lbl == "": #Si la regla contiene etiqueta
-                            sustitucionMarkovD(text, reemplazos, i + 1, z + 1)#Llamado recursivo con la regla en la posicion i + 1
-                        else:
-                            sustitucionMarkovD(text, reemplazos, aumentador(reemplazos, lbl), z + 1)#Llamado recursivo con la posicion de la etiqueta
-                    else:#El patron no esta en la hilera de entrada
-                        sustitucionMarkovD(text, reemplazos, i + 1, z)#Llamado recursivo con la regla en la posicion i + 1
-                else: #no hay variable en el reemplazo
-                    if patronVar in text: #El reemp. no tiene variables
-                        text = text.replace(patronVar, remp, 1)#Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                        if term: #Si la regla es terminal
-                            textFinal = text #Asigna el resultado a la variable global textFinal
-                            return text #Retorna, y sale del metodo
-                        if lbl == "":
-                            sustitucionMarkovD(text, reemplazos, i + 1, z + 1)#Llamado recursivo con la regla en la posicion i + 1 
-                        else:
-                            sustitucionMarkovD(text, reemplazos, aumentador(reemplazos, lbl), z + 1) #Llamado recursivo con la posicion de la etiqueta 
-                    else: #El patron no esta en la hilera de entrada
-                        sustitucionMarkovD(text, reemplazos, i + 1, z)#Llamado recursivo con la regla en la posicion i + 1
-            else:
-                textFinal = text #Asigna el resultado a la variable global textFinal
-                return text #Retorna, y sale del metodo
-        elif rempVar != "": #No hay variable en el patron, si hay variable en el reemplazo
-            z = getMarkerIndex(text, varT) #Guarda la pos del marcador en el texto de entrada
-            rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
-            rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
-            if patron in text: #Si el texto contiene el patron de reemplazo
-                text = text.replace(patron, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                if term: #Si la regla es terminal
-                    textFinal = text #Asigna el resultado a la variable global textFinal
-                    return text #Retorna, y sale del metodo
-                if lbl == "":
-                    sustitucionMarkovD(text, reemplazos, i + 1, z + 1) #Llamado recursivo con la regla en la posicion i + 1 
+def sustitucionMarkovD(text, reemplazos):
+    w = 0
+    while w < len(reemplazos) + 1:
+        i = 0
+        z = 0
+        while i < len(reemplazos) - 3:
+            if checkvars(reemplazos[i][1], reemplazos [len(reemplazos) - 2])!= "" and getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) == len(text) - 1: #el marcador esta al final de la hilera de entrada
+                i += 1 #Se pasa a la siguiente regla
+                z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
+                z = z - 1 #Se pasa a la izq del marcador
+            elif checkvars(reemplazos[i][1], reemplazos [len(reemplazos) - 2])!= "":
+                z = getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) #Guarda la pos del marcador en el texto de entrada
+                z = z + 1 #Se pasa a la derecha de marcador
+            label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
+            patron = reemplazos[i][1] #Asigna el patron de la regla
+            remp = reemplazos[i][2] #Asigna el remplazo de la regla
+            term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
+            lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
+            lbl = lbl[:len(lbl) - 1] #Elimina el parentesis cerrado ) de la etiqueta
+            var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
+            patronVar = checkvars(patron, var) #Guarda la variable del patron (si hay)
+            varT = getMarker(patron, reemplazos [len(reemplazos) - 1]) #Guarda el marcador del patron (si hay)
+            aux = patronVar #Guarda la variable del patron (si hay)
+            rempVar = checkvars(remp, var) #Guarda la variable del reemplazo (si hay)
+            if patronVar != "": #Si hay variable en el patron
+                if z < len(text):
+                    patronVar = patron.replace(patronVar, text[z], 1) #Reemplaza el patron con el caracter de la entrada en la pos z
+                    if rempVar != "": #Si hay variable en el reemplazo
+                        rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
+                        rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
+                        if patronVar in text: #Si el texto contiene el patron de reemplazo
+                            text = text.replace(patronVar, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                            if term: #Si la regla es terminal
+                                return text #Retorna, y sale del metodo
+                            if lbl == "": #Si la regla contiene etiqueta
+                                z = z + 1
+                                i = i + 1
+                            else:
+                                z = z + 1
+                                i = aumentador(reemplazos, lbl)
+                        else:#El patron no esta en la hilera de entrada
+                            i = i + 1
+                            w = w + 1
+                    else: #no hay variable en el reemplazo
+                        if patronVar in text: #Si el texto contiene el patron de reemplazo
+                            text = text.replace(patronVar, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                            if term: #Si la regla es terminal
+                                return text #Retorna, y sale del metodo
+                            if lbl == "": #Si la regla contiene etiqueta
+                                z = z + 1
+                                i = i + 1
+                            else:
+                                z = z + 1
+                                i = aumentador(reemplazos, lbl)
+                        else: #El patron no esta en la hilera de entrada
+                            i = i + 1
+                            w = w + 1
                 else:
-                    sustitucionMarkovD(text, reemplazos, aumentador(reemplazos, lbl), z + 1) #Llamado recursivo con la posicion de la etiqueta 
-            else: #El patron no esta en la hilera de entrada
-                sustitucionMarkovD(text, reemplazos, i + 1, z) #Llamado recursivo con la regla en la posicion i + 1 
-        else: #No hay variable en el patron ni en el reemplazo
-            if patron in text: #Si la regla es terminal
-                text = text.replace(patron, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
-                if term: #Si la regla es terminal
-                    textFinal = text #Asigna el resultado a la variable global textFinal
-                    return text #Retorna, y sale del metodo
-                if lbl == "":
-                    sustitucionMarkovD(text, reemplazos, i + 1, z) #Llamado recursivo con la regla en la posicion i + 1 
-                else:
-                    sustitucionMarkovD(text, reemplazos, aumentador(reemplazos, lbl), z) #Llamado recursivo con la posicion de la etiqueta 
-            else: #El patron no esta en la hilera de entrada
-                sustitucionMarkovD(text, reemplazos, i + 1, z)  #Llamado recursivo con la regla en la posicion i + 1 
+                    return text
+            elif rempVar != "": #No hay variable en el patron, si hay variable en el reemplazo 
+                rempVar = remp.replace(rempVar, text[z], 1) #Reemplaza el remp con el caracter de la entrada en la pos z
+                rempVar = eliminaEspacios(rempVar) #Elimina espacios del reemplazo (si hay)
+                if patron in text: #Si el texto contiene el patron de reemplazo
+                    text = text.replace(patron, rempVar, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                    if term: #Si la regla es terminal
+                        return text #Retorna, y sale del metodo
+                    if lbl == "": #Si la regla contiene etiqueta
+                        z = z + 1
+                        i = i + 1
+                    else:
+                        z = z + 1
+                        i = aumentador(reemplazos, lbl)
+                else: #El patron no esta en la hilera de entrada
+                    i = i + 1
+                    w = w + 1
+            else: #No hay variable en el patron ni en el reemplazo
+                if patron in text: #Si la regla es terminal
+                    text = text.replace(patron, remp, 1) #Reemplaza el texto con el reemplazo de la regla y lo asigna a text
+                    if term: #Si la regla es terminal
+                        return text #Retorna, y sale del metodo
+                    if lbl == "": #Si la regla contiene etiqueta
+                        i = i + 1
+                    else:
+                        i = aumentador(reemplazos, lbl)
+                else: #El patron no esta en la hilera de entrada
+                    i = i + 1
+                    w = w + 1 
     else:
-        textFinal = text #Asigna el resultado a la variable global textFinal
-        return text #Retorna, y sale del metodo
+        return text
 
 #Llama al metodo sustitucionMarkov
-def markovStepped(text, reemplazos, i, z):
-    global textFinal
-    textFinal = ""
+def markovStepped(text, reemplazos):
     writeOnText("Entrada: " + text + "\n\n", textBot)
     symbols = reemplazos [len(reemplazos) - 3] #Guarda el alfabeto del vector reemplazos en symbols
     var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
     markers = reemplazos [len(reemplazos) - 1] #Guarda markers del vector reemplazos en symbols
     if checkSymbols(text, symbols, markers) == 1:
-        sustitucionMarkovStepped(text, reemplazos, i, z) #Llamada al metodo que realiza la sustitucion con la regla i = 0
         writeOnText("No se pueden aplicar mas reglas\n", textBot)
-        writeOnText("\nSalida: " + textFinal + "\n", textBot)
+        writeOnText("\nSalida: " + sustitucionMarkovStepped(text, reemplazos) + "\n", textBot)#Llamada al metodo que realiza la sustitucion
     else:
         popup("No coincide el alfabeto!!".upper())
 
 #Llama al metodo sustitucionMarkov Directo
-def markovDirecto(text, reemplazos, i, z):
-    global textFinal
-    textFinal = ""
+def markovDirecto(text, reemplazos):
     writeOnText("Entrada: " + text + "\n", textBot)
     symbols = reemplazos [len(reemplazos) - 3] #Guarda el alfabeto del vector reemplazos en symbols
     var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
     markers = reemplazos [len(reemplazos) - 1] #Guarda markers del vector reemplazos en symbols
     if checkSymbols(text, symbols, markers) == 1:
-        sustitucionMarkovD(text, reemplazos, i, z) #Llamada al metodo que realiza la sustitucion con la regla i = 0
-        writeOnText("Salida: " + textFinal + "\n", textBot)
+        writeOnText("Salida: " + sustitucionMarkovD(text, reemplazos) + "\n", textBot)#Llamada al metodo que realiza la sustitucion
     else:
         popup("No coincide el alfabeto!!".upper())
 
@@ -414,7 +423,7 @@ def exeMarkovS():
     textBot.update()
     if entrada != "":
         if algoritmoMarkov != "":
-            markovStepped(entrada, getReemplazos(algoritmoMarkov), 0, 0)
+            markovStepped(entrada, getReemplazos(algoritmoMarkov))
         else:
             popup("NO SE HA INTRODUCIDO UN ALGORITMO!")
     else:
@@ -430,7 +439,7 @@ def exeMarkovD():
     textBot.update()
     if entrada != "":
         if algoritmoMarkov != "":
-            markovDirecto(entrada, getReemplazos(algoritmoMarkov), 0, 0)
+            markovDirecto(entrada, getReemplazos(algoritmoMarkov))
         else:
             popup("NO SE HA INTRODUCIDO UN ALGORITMO!")
     else:
@@ -575,7 +584,7 @@ def realizaPruebasHileras(path):
     algoritmoMarkov = retrieveInput(textTop)
     if algoritmoMarkov != "":
         for line in file:
-            markovDirecto(eliminaSaltos(line), getReemplazos(algoritmoMarkov), 0, 0)
+            markovDirecto(eliminaSaltos(line), getReemplazos(algoritmoMarkov))
     else:
         popup( "NO SE HA INTRODUCIDO UN ALGORITMO!")
 
@@ -592,7 +601,7 @@ def realizaPruebasHilerasStepped(path):
     algoritmoMarkov = retrieveInput(textTop)
     if algoritmoMarkov != "":
         for line in file:
-            markovStepped(eliminaSaltos(line), getReemplazos(algoritmoMarkov), 0, 0)
+            markovStepped(eliminaSaltos(line), getReemplazos(algoritmoMarkov))
     else:
         popup("NO SE HA INTRODUCIDO UN ALGORITMO!")
 
