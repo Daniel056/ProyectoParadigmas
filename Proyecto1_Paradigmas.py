@@ -82,9 +82,10 @@ def getReemplazos(entrada):
 
 def sustitucionMarkovStepped(text, reemplazos):
     w = 0
-    while w < len(reemplazos) + 1:
+    while w < len(reemplazos) + 3:
         i = 0
         z = 0
+        
         while i < len(reemplazos) - 3:
             if checkvars(reemplazos[i][1], reemplazos [len(reemplazos) - 2])!= "" and getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) == len(text) - 1:   
             #el marcador esta al final de la hilera de entrada
@@ -96,8 +97,6 @@ def sustitucionMarkovStepped(text, reemplazos):
                 z = z + 1 #Se pasa a la derecha de marcador
             label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
             patron = reemplazos[i][1] #Asigna el patron de la regla
-            if parton == "":
-                patron = text[0]
             remp = reemplazos[i][2] #Asigna el remplazo de la regla
             term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
             lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
@@ -359,8 +358,7 @@ def markovStepped(text, reemplazos):
     var = reemplazos [len(reemplazos) - 2] #Guarda variables del vector reemplazos en symbols
     markers = reemplazos [len(reemplazos) - 1] #Guarda markers del vector reemplazos en symbols
     if checkSymbols(text, symbols, markers) == 1:
-        writeOnText("No se pueden aplicar mas reglas\n", textBot)
-        writeOnText("\nSalida: " + sustitucionMarkovStepped(text, reemplazos) + "\n", textBot)#Llamada al metodo que realiza la sustitucion
+        writeOnText("No se pueden aplicar mas reglas\n\nSalida: " + sustitucionMarkovStepped(text, reemplazos) + "\n", textBot)#Llamada al metodo que realiza la sustitucion
     else:
         popup("No coincide el alfabeto!!".upper())
 
