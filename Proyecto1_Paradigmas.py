@@ -85,7 +85,6 @@ def sustitucionMarkovStepped(text, reemplazos):
     while w < len(reemplazos) + 3:
         i = 0
         z = 0
-        
         while i < len(reemplazos) - 3:
             if checkvars(reemplazos[i][1], reemplazos [len(reemplazos) - 2])!= "" and getMarkerIndex(text, getMarker(reemplazos[i][1], reemplazos [len(reemplazos) - 1])) == len(text) - 1:   
             #el marcador esta al final de la hilera de entrada
@@ -97,6 +96,8 @@ def sustitucionMarkovStepped(text, reemplazos):
                 z = z + 1 #Se pasa a la derecha de marcador
             label = reemplazos[i][0] #Asigna el nombre de la regla (vector de vectores)
             patron = reemplazos[i][1] #Asigna el patron de la regla
+            if patron == "":
+                text = insertaEspacio(text)
             remp = reemplazos[i][2] #Asigna el remplazo de la regla
             term = reemplazos[i][3] #Si la regla es terminal asigna true, sino false
             lbl = reemplazos[i][4][1:] #Asigna la etiqueta de la regla, eliminando el parentesis abierto (
@@ -204,6 +205,10 @@ def aumentador(reemplazos, lbl):
             break
         i += 1
     return i
+
+#Inserta un espacio vacio al inicio de la hilera de entrada
+def insertaEspacio(text):
+    return text.replace(text[0], "" + text[0], 1)
 
 #Devuelve la posicion del marcador en la hilera de prueba, si no hay devuelve -1
 def getMarkerIndex(entrada, marker):
