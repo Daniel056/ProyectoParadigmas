@@ -1,0 +1,6 @@
+%Conversion de binario a unario
+%Reglas
+1 -> 0|
+|0 -> 0||
+0 -> Λ
+
