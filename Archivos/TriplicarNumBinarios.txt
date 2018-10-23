@@ -1,0 +1,32 @@
+%Algoritmo triplicar numeros binarios (multiplicar por 3)
+%Este algoritmo multipla cualquier numero binario por 3
+#simbols 01ABCDEFGH
+#vars xb
+#markers U 
+0b -> A0
+1b ->A1
+xA0 -> Bx0
+xA1 -> Ex1
+xAb -> x00
+xB0 -> Ax0
+xB1 -> Cx1
+xBb -> x00
+xC0 -> Dx1
+xC1 -> Fx0
+xCb -> xb1
+xD0 -> Ax0
+xD1 -> Cx1
+xDb -> xbb
+xE0 -> Dx1
+xE1 -> Fx0
+xEb -> Fx0
+xEb -> xb1
+xF0 -> Gx0
+xF1 -> Fx1
+xFb -> x10
+xG0 -> Ax1
+xG1 -> Hx0
+xGb -> xbb
+xHU -> Gx0
+xH1 -> Fx1
+xHb -> x10
