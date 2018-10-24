@@ -38,7 +38,7 @@
   (lambda (polinomios)
     (cond
       ((null? polinomios) '())
-      ((null? (cddr polinomios)) (suma (car polinomios) (cadr polinomios)))
+      ((null? (cddr polinomios)) (display-p (suma (car polinomios) (cadr polinomios))))
       (else (+p (append (cddr polinomios) (cons (suma (car polinomios) (cadr polinomios)) '())))))))
 
 (define suma
@@ -56,7 +56,7 @@
   (lambda (polinomios)
     (cond
       ((null? polinomios) '())
-      ((null? (cddr polinomios)) (resta (car polinomios) (cadr polinomios)))
+      ((null? (cddr polinomios)) (display-p (resta (car polinomios) (cadr polinomios))))
       (else (-p (append (cddr polinomios) (cons (resta (car polinomios) (cadr polinomios)) '())))))))
 
 (define resta
@@ -74,7 +74,7 @@
   (lambda (polinomios)
     (cond
       ((null? polinomios) '())
-      ((null? (cddr polinomios)) (multiplica (car polinomios) (cadr polinomios)))
+      ((null? (cddr polinomios)) (display-p (multiplica (car polinomios) (cadr polinomios))))
       (else (*p (append (cddr polinomios) (cons (multiplica (car polinomios) (cadr polinomios)) '())))))))
 
 (define multiplica
@@ -97,7 +97,7 @@
       ((= (car p1) 0) '(Division entre 0))
       ((= (car p2) 0) '(Division entre 0))
       (else
-       (cons (* (car p1) (car p2))
+       (cons (quotient (car p1) (car p2))
              (qt-p (cdr p1) (cdr p2)))))))
 
 ;--------------------------------------------------------------------------
