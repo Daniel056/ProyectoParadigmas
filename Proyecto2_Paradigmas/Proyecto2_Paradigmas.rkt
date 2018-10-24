@@ -116,8 +116,8 @@
 ;División de Polinomios (Parte 3)
 (define /-p
   (lambda (p1 p2)
-    (cons (qt-p p1 p2)
-          (rem-p p1 p2))))
+    (append (cons (qt-p p1 p2) '())
+            (cons (rem-p p1 p2) '()))))
 
 ;--------------------------------------------------------------------------
 ;Derivación de Polinomios
