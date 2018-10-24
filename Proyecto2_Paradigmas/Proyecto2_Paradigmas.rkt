@@ -94,14 +94,22 @@
     (cond
       ((null? p1) p2)
       ((null? p2) p1)
-      ((= (car p1) 0) '(Division entre 0))
       ((= (car p2) 0) '(Division entre 0))
       (else
        (cons (quotient (car p1) (car p2))
              (qt-p (cdr p1) (cdr p2)))))))
 
 ;--------------------------------------------------------------------------
-;Multiplicación de Polinomios (Parte 2)
+;División de Polinomios (Parte 2)
+(define rem-p
+  (lambda (p1 p2)
+    (cond
+      ((null? p1) p2)
+      ((null? p2) p1)
+      ((= (car p2) 0) '(Division entre 0))
+      (else
+       (cons (remainder (car p1) (car p2))
+             (rem-p (cdr p1) (cdr p2)))))))
 
 
 ;--------------------------------------------------------------------------
