@@ -89,7 +89,16 @@
 
 ;--------------------------------------------------------------------------
 ;División de Polinomios (Parte 1)
-
+(define qt-p
+  (lambda (p1 p2)
+    (cond
+      ((null? p1) p2)
+      ((null? p2) p1)
+      ((= (car p1) 0) '(Division entre 0))
+      ((= (car p2) 0) '(Division entre 0))
+      (else
+       (cons (* (car p1) (car p2))
+             (qt-p (cdr p1) (cdr p2)))))))
 
 ;--------------------------------------------------------------------------
 ;Multiplicación de Polinomios (Parte 2)
