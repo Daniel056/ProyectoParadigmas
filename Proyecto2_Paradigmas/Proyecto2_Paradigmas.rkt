@@ -121,6 +121,25 @@
 
 ;--------------------------------------------------------------------------
 ;Derivación de Polinomios
+(define drv-p
+  (lambda (polinomios)
+    (cond
+      ((null? polinomios) '())
+      (else
+       (drv-p1 polinomios '())))))
+
+(define drv-p1
+  (lambda (polinomios derivadas)
+    (cond
+      ((null? polinomios) (reverse derivadas))
+      (else (drv-p1 (cdr polinomios) (append (cons (deriva (cdar polinomios) '() 1) '()) derivadas))))))
+
+(define deriva
+  (lambda (polinomio derivada k)
+    (cond
+      ((null? polinomio) derivada)
+      (else
+       (deriva (cdr polinomio) (append derivada (cons (* (car polinomio) k) '())) (+ k 1))))))
 
 
 ;--------------------------------------------------------------------------
