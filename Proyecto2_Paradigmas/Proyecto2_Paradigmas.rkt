@@ -89,11 +89,7 @@
 
 ;--------------------------------------------------------------------------
 ;División de Polinomios (Parte 1)
-(define qt-p
-  (lambda (dividendo divisor)
-    (cond
-      ((= divisor 0) '())
-      (else (quotient dividendo divisor)))))
+
 
 ;--------------------------------------------------------------------------
 ;Multiplicación de Polinomios (Parte 2)
