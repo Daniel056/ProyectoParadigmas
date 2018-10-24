@@ -35,24 +35,38 @@
 ;--------------------------------------------------------------------------
 ;Suma de Polinomios
 (define +p
+  (lambda (polinomios)
+    (cond
+      ((null? polinomios) '())
+      ((null? (cddr polinomios)) (suma (car polinomios) (cadr polinomios)))
+      (else (+p (append (cddr polinomios) (cons (suma (car polinomios) (cadr polinomios)) '())))))))
+
+(define suma
   (lambda (p1 p2)
     (cond
       ((null? p1) p2)
       ((null? p2) p1)
       (else
        (cons (+ (car p1) (car p2))
-             (+p (cdr p1) (cdr p2)))))))
+             (suma (cdr p1) (cdr p2)))))))
 
 ;--------------------------------------------------------------------------
 ;Resta de Polinomios
 (define -p
+  (lambda (polinomios)
+    (cond
+      ((null? polinomios) '())
+      ((null? (cddr polinomios)) (resta (car polinomios) (cadr polinomios)))
+      (else (-p (append (cddr polinomios) (cons (resta (car polinomios) (cadr polinomios)) '())))))))
+
+(define resta
   (lambda (p1 p2)
     (cond
       ((null? p1) p2)
       ((null? p2) p1)
       (else
        (cons (- (car p1) (car p2))
-             (-p (cdr p1) (cdr p2)))))))
+             (resta (cdr p1) (cdr p2)))))))
 
 ;--------------------------------------------------------------------------
 ;Multiplicación de Polinomios
