@@ -70,7 +70,22 @@
 
 ;--------------------------------------------------------------------------
 ;Multiplicación de Polinomios
+(define *p
+  (lambda (polinomios)
+    (cond
+      ((null? polinomios) '())
+      ((null? (cddr polinomios)) (multiplica (car polinomios) (cadr polinomios)))
+      (else (*p (append (cddr polinomios) (cons (multiplica (car polinomios) (cadr polinomios)) '())))))))
 
+(define multiplica
+  (lambda (p1 p2)
+    (cond
+      ((null? p1) p2)
+      ((null? p2) p1)
+      (else
+       (cons (* (car p1) (car p2))
+             (multiplica (cdr p1) (cdr p2)))))))
+    
 
 ;--------------------------------------------------------------------------
 ;División de Polinomios (Parte 1)
