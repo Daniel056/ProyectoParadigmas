@@ -31,7 +31,9 @@
                                     (string-append "x^" (number->string i))))])
                      (convert-to-strings (cdr ls) (+ i 1))))))]
       (foldl string-append "" (convert-to-strings poly 0)))))
-          
+
+
+
 ;--------------------------------------------------------------------------
 ;Suma de Polinomios
 (define +p
@@ -74,18 +76,22 @@
   (lambda (polinomios)
     (cond
       ((null? polinomios) '())
-      ((null? (cddr polinomios)) (display-p (multiplica (car polinomios) (cadr polinomios))))
-      (else (*p (append (cddr polinomios) (cons (multiplica (car polinomios) (cadr polinomios)) '())))))))
+      ((null? (cddr polinomios)) (display-p (multiplicacion (car polinomios) (cadr polinomios))))
+      (else (*p (append (cddr polinomios) (cons (multiplicacion (car polinomios) (cadr polinomios)) '())))))))
+
+(define multiplicacion
+  (lambda (pol1 pol2)
+    (cond
+      ((null? pol2) '(0))
+      (else
+        (suma (multiplica pol1 (car pol2)) (multiplicacion (append '(0) pol1) (cdr pol2)))))))
 
 (define multiplica
-  (lambda (p1 p2)
+  (lambda (polinomio k)
     (cond
-      ((null? p1) p2)
-      ((null? p2) p1)
+      ((null? polinomio) '())
       (else
-       (cons (* (car p1) (car p2))
-             (multiplica (cdr p1) (cdr p2)))))))
-    
+       (cons (* k (car polinomio)) (multiplica (cdr polinomio) k))))))   
 
 ;--------------------------------------------------------------------------
 ;División de Polinomios (Parte 1)
