@@ -17,14 +17,26 @@
   (lambda (polinomio k resultado) 
     (cond
       ((null? polinomio) resultado)
-      ((= (car polinomio) 0) (cons-pol (cdr polinomio) (+ k 1) resultado))
+      ((= (car polinomio) 0)
+       (cond
+         ((= k 0)
+          (cond
+            ((= (length polinomio) 1) (cons-pol (cdr polinomio) (+ k 1)(string-append resultado (number->string (car polinomio)))))
+            (else (cons-pol (cdr polinomio) (+ k 1) resultado))))
+         (else (cons-pol (cdr polinomio) (+ k 1) resultado))))
       ((> (car polinomio) 0)
        (cond
          ((= k 0) (cons-pol (cdr polinomio) (+ k 1) (string-append resultado (number->string (car polinomio)))))
-         ((= k 1) (cons-pol (cdr polinomio) (+ k 1) (string-append resultado (string-append "+" (string-append (number->string (car polinomio)) "x")))))
+         ((= k 1)
+          (cond
+            ((= (car polinomio) 1) (cons-pol (cdr polinomio) (+ k 1) (string-append resultado "+x")))
+            (else (cons-pol (cdr polinomio) (+ k 1) (string-append resultado (string-append "+" (string-append (number->string (car polinomio)) "x")))))))
          (else
-          (cons-pol (cdr polinomio) (+ k 1)
-                     (string-append resultado (string-append "+" (string-append (number->string (car polinomio)) (string-append "x^" (number->string k)))))))))
+          (cond
+            ((= (car polinomio) 1) (cons-pol (cdr polinomio) (+ k 1) (string-append resultado (string-append "+x^" (number->string k)))))
+            (else
+             (cons-pol (cdr polinomio) (+ k 1)
+               (string-append resultado (string-append "+" (string-append (number->string (car polinomio)) (string-append "x^" (number->string k)))))))))))
        (else
         (cond
           ((= k 0) (cons-pol (cdr polinomio) (+ k 1) (string-append resultado (number->string (car polinomio)))))
