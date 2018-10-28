@@ -214,8 +214,7 @@
     (cond
       ((= num 0) div)
       ((> num 0)
-       (cond
-         ((= k 0) div)
+       (cond ((= k 0) div)
          (else
           (cond ((= (remainder num k) 0) (divisores num (append div (cons k (cons (* -1 k) '()))) (- k 1)))
                 (else (divisores num div (- k 1)))))))
@@ -228,7 +227,7 @@
 (define d
   (lambda (polinomio)
    (cond
-     ((null? polinomio) 0)
+     ((null? polinomio) '())
      (else
       (cond
         ((= (car polinomio) 0) 0)
@@ -238,7 +237,10 @@
 (define raices
   (lambda (pol divisores)
     (cond
-      ((null? divisores) 0)
+      ((null? divisores)
+       (cond
+         ((= (length (simplifica pol) 3) (append (cons (cuadratica1 (simplifica pol)) '()) (cons (cuadratica2 (simplifica pol)) '()))))
+         (else '())))
       ((= (eval-p pol (car divisores)) 0) (append (cons 1 '()) (cons (* -1 (car divisores)) '())))
       (else
        (raices pol (cdr divisores))))))
@@ -250,7 +252,7 @@
 (define r
   (lambda (polinomio)
    (cond
-    ((null? polinomio) 0)
+    ((null? polinomio) '())
     (else
      (raices polinomio (divisores1 polinomio))))))
 ;--------------------------------------------------------------------------
@@ -270,7 +272,7 @@
 (define ruff
   (lambda (polinomio)
     (cond
-      ((null? polinomio) 0)
+      ((null? polinomio) '())
       (else
        (ruffini (cdr (reverse polinomio)) (cons (car (reverse polinomio)) '()) (* -1 (car (reverse (raices1 polinomio)))))))))
 ;--------------------------------------------------------------------------
@@ -298,7 +300,7 @@
       (else
        (cond
          ((< (length (simplifica polinomio)) 3) (simplifica polinomio))
-         ((= 3 (length (simplifica polinomio))) (append (cons (cuadratica1 (simplifica polinomio)) '()) (cons (cuadratica2 (simplifica polinomio)) '())))  
+         ;((= 3 (length (simplifica polinomio))) (append (cons (cuadratica1 (simplifica polinomio)) '()) (cons (cuadratica2 (simplifica polinomio)) '())))  
          (else
           (factor1 (simplifica polinomio) '())))))))
 
