@@ -296,7 +296,29 @@
     (cond
       ((null? polinomio) polinomio)
       (else
-       (factor1 (simplifica polinomio) '())))))
+       (cond
+         ((< (length (simplifica polinomio)) 3) (simplifica polinomio))
+         ((= 3 (length (simplifica polinomio))) (append (cons (cuadratica1 (simplifica polinomio)) '()) (cons (cuadratica2 (simplifica polinomio)) '())))  
+         (else
+          (factor1 (simplifica polinomio) '())))))))
+
+(define cuadratica1
+  (lambda (polinomio)
+    (cond
+      ((null? polinomio) polinomio)
+      ((= 0 (car (reverse polinomio))) (simplifica polinomio))
+      (else
+       (cons (* -1 (/ (+ (* -1 (cadr polinomio)) (sqrt (- (* (cadr polinomio) (cadr polinomio)) (* 4 (* (car polinomio) (car (reverse polinomio)))))))
+          (* 2 (car (reverse polinomio))))) '(1))))))
+
+(define cuadratica2
+  (lambda (polinomio)
+    (cond
+      ((null? polinomio) polinomio)
+      ((= 0 (car (reverse polinomio))) '())
+      (else
+       (cons (* -1 (/ (- (* -1 (cadr polinomio)) (sqrt (- (* (cadr polinomio) (cadr polinomio)) (* 4 (* (car polinomio) (car (reverse polinomio)))))))
+          (* 2 (car (reverse polinomio))))) '(1))))))
 ;--------------------------------------------------------------------------
 (define common-f
   (lambda (polinomio cf)
@@ -310,5 +332,13 @@
   (lambda (a b)
   (cond ((= b 0) a)
       (else (gcd b (modulo a b))))))
+
  
 
+
+
+
+
+
+   
+  
