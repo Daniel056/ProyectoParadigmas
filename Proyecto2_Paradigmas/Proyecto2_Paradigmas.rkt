@@ -237,10 +237,7 @@
 (define raices
   (lambda (pol divisores)
     (cond
-      ((null? divisores)
-       (cond
-         ((= (length (simplifica pol) 3) (append (cons (cuadratica1 (simplifica pol)) '()) (cons (cuadratica2 (simplifica pol)) '()))))
-         (else '())))
+      ((null? divisores) '())
       ((= (eval-p pol (car divisores)) 0) (append (cons 1 '()) (cons (* -1 (car divisores)) '())))
       (else
        (raices pol (cdr divisores))))))
