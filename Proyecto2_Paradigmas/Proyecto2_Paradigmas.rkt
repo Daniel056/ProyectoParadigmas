@@ -1,9 +1,9 @@
 #lang racket
-;-----Proyecto #2 Paradigmas------------------
-;-----Funciones con Polinomios----------------
-;-----Intengrantes: Esteban Montero Fonseca---
-;------------------ Jefferson Moreno Zuñiga---
-;------------------ Daniel Zamora García------
+;-----Proyecto #2 Paradigmas--------------------------------------
+;-----Funciones con Polinomios------------------------------------
+;-----Intengrantes: Esteban Montero Fonseca 304830405 Grupo 6pm---
+;------------------ Jefferson Moreno Zuñiga 116270399 Grupo 3pm---
+;------------------ Daniel Zamora García 402310604 Grupo 3pm------
 
 ;--------------------------------------------------------------------------
 ;Contruir el polinomio
