@@ -1,4 +1,7 @@
-%c0(Vertice1, Vertice2, Confiabilidad, Velocidad)
+%['~/Documents/GitHub/ProyectoParadigmas/Proyecto3_Paradigmas/Grafo.pl',
+% '~/Documents/GitHub/ProyectoParadigmas/Proyecto3_Paradigmas/Proyecto3_Paradigmas.pl'].
+
+% c0(Vertice1, Vertice2, Confiabilidad, Velocidad)
 c0(1,2,0.9,4).
 c0(1,5,0.875,6).
 c0(1,6,0.875,8).
