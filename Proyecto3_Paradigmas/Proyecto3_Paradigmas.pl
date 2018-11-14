@@ -1,7 +1,8 @@
 %conexiones en ambas direcciones
 c(A,B,C,V) :- c0(A,B,C,V).
 c(A,B,C,V) :- c0(B,A,C,V).
-%--------------------------------------------
+%------------------------------------------------
+
 % 1)
 conexion(A,B) :- ruta(A,B,_,_,_).
 
@@ -30,12 +31,33 @@ ruta(Z,Z,R,C,V,R1,C,V) :- append(R,[Z],R1).
 ruta(A,B,[],0,0,R,C,V):-
 	A \= B,
 	c(A,D,Cac,Vac),
+	B == D,
+	append([],[A],Br),
+	ruta(D,B,Br,Cac,Vac,R,C,V).
+
+ruta(A,B,[],0,0,R,C,V):-
+	A \= B,
+	c(A,D,Cac,Vac),
+	B \= D,
+	\+cliente(D),
 	append([],[A],Br),
 	ruta(D,B,Br,Cac,Vac,R,C,V).
 	
 ruta(A,B,Ar,Ac,Av,R,C,V) :-
 	A \= B, \+miembro(A,Ar),
 	c(A,D,Cac,Vac),
+	B == D,
+	>(Av,0),
+	C1 is Ac * Cac,
+	min(Av,Vac,V1),
+	append(Ar,[A],Br),
+	ruta(D,B,Br,C1,V1,R,C,V).
+	
+ruta(A,B,Ar,Ac,Av,R,C,V) :-
+	A \= B, \+miembro(A,Ar),
+	c(A,D,Cac,Vac),
+	B \= D,
+	\+cliente(D),
 	>(Av,0),
 	C1 is Ac * Cac,
 	min(Av,Vac,V1),
