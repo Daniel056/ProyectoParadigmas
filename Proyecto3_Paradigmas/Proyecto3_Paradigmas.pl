@@ -3,42 +3,47 @@ c(A,B,C,V) :- c0(A,B,C,V).
 c(A,B,C,V) :- c0(B,A,C,V).
 %--------------------------------------------
 % 1)
-conexion(A,B) :- ruta(A,B,_,_).
+conexion(A,B) :- ruta(A,B,_,_,_).
 
 % 2)
-conexion(A,B,R):-ruta(A,B,R,_).
+conexion(A,B,R):-ruta(A,B,R,_,_).
 
 % 3)
-velocidad_maxima(A,B,R,V):- ruta(A,B,R,V).
+velocidad_maxima(A,B,R,V):- ruta(A,B,R,_,V).
 
 % 4)
 velocidad_maxima(A,B,V) :- 
-	findall(V1,ruta(A,B,_,V1),X),
+	findall(V1,ruta(A,B,_,_,V1),X),
 	min(X,V).
+
+% 5)
+confiabilidad(A,B,R,C):-
+	ruta(A,B,R,C,_).
 %------------------------------------------------
 %Métodos auxiliares
 %------------------------------------------------
 
 %Encuentra ruta entre A y B y su velocidad maxima
-ruta(A,B,R,V) :- ruta(A,B,[],0,R,V).
-ruta(Z,Z,R,V,R1,V) :- append(R,[Z],R1).
+ruta(A,B,R,C,V) :- ruta(A,B,[],0,0,R,C,V).
+ruta(Z,Z,R,C,V,R1,C,V) :- append(R,[Z],R1).
 
-ruta(A,B,[],0,R,V):-
+ruta(A,B,[],0,0,R,C,V):-
 	A \= B,
-	c(A,D,_,Vac),
+	c(A,D,Cac,Vac),
 	append([],[A],Br),
-	ruta(D,B,Br,Vac,R,V).
+	ruta(D,B,Br,Cac,Vac,R,C,V).
 	
-ruta(A,B,Ar,Av,R,V) :-
+ruta(A,B,Ar,Ac,Av,R,C,V) :-
 	A \= B, \+miembro(A,Ar),
-	c(A,D,_,Vac),
+	c(A,D,Cac,Vac),
 	>(Av,0),
+	C1 is Ac * Cac,
 	min(Av,Vac,V1),
 	append(Ar,[A],Br),
-	ruta(D,B,Br,V1,R,V).
+	ruta(D,B,Br,C1,V1,R,C,V).
 %------------------------------------------------
 
-% Verifica si ya se reviso una ruta especifica
+% Verifica si ya se revisó una ruta especifica
 miembro(X,[X|_]).
 miembro(X,[_|Xr]) :- miembro(X,Xr).
 %------------------------------------------------
