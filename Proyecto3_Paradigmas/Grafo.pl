@@ -1,5 +1,9 @@
 %['~/Documents/GitHub/ProyectoParadigmas/Proyecto3_Paradigmas/Grafo.pl',
 % '~/Documents/GitHub/ProyectoParadigmas/Proyecto3_Paradigmas/Proyecto3_Paradigmas.pl'].
+% Integrantes:
+% Esteban Montero Fonseca, 304830405.
+% Jefferson Moreno Zuñiga, 116270399.
+% Daniel Zamora García, 402310604.
 
 % c0(Vertice1, Vertice2, Confiabilidad, Velocidad)
 c0(1,2,0.9,4).

@@ -1,3 +1,8 @@
+% Integrantes:
+% Esteban Montero Fonseca, 304830405.
+% Jefferson Moreno Zuñiga, 116270399.
+% Daniel Zamora García, 402310604.
+
 %conexiones en ambas direcciones
 c(A,B,C,V) :- c0(A,B,C,V).
 c(A,B,C,V) :- c0(B,A,C,V).
